@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="579.0" prefWidth="440.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+   <children>
+      <Button layoutX="200.0" layoutY="33.0" mnemonicParsing="false" onAction="#buttonPressed" prefHeight="92.0" prefWidth="209.0" text="Znajdz plik">
+         <font>
+            <Font size="29.0" />
+         </font>
+      </Button>
+      <Button layoutX="200.0" layoutY="417.0" mnemonicParsing="false" onAction="#saveButtonPressed" prefHeight="92.0" prefWidth="209.0" text="DZIAŁAJ">
+         <font>
+            <Font size="29.0" />
+         </font>
+      </Button>
+      <TextField fx:id="TextFieldDescrizioneFiliale" layoutX="150.0" layoutY="66.0" minWidth="25.0" prefWidth="25.0" />
+      <TextField fx:id="TextFieldFiliale" layoutX="150.0" layoutY="105.0" minWidth="25.0" prefWidth="25.0" />
+      <TextField fx:id="TextFieldDislocazione" layoutX="150.0" layoutY="144.0" minWidth="25.0" prefWidth="25.0" />
+      <TextField fx:id="TextFieldTipoDoc" layoutX="150.0" layoutY="183.0" minWidth="25.0" prefWidth="25.0" />
+      <TextField fx:id="TextFieldDescTipo" layoutX="150.0" layoutY="225.0" minWidth="25.0" prefWidth="25.0" />
+      <TextField fx:id="TextFieldAnniCons" layoutX="150.0" layoutY="259.0" minWidth="25.0" prefWidth="25.0" />
+      <TextField fx:id="textFieldProgrUda" layoutX="150.0" layoutY="26.0" minWidth="25.0" onAction="#handleButton" onKeyPressed="#HandleKeyPressed" prefWidth="25.0" />
+      <TextField fx:id="TextFieldDataInizio" layoutX="150.0" layoutY="295.0" minWidth="25.0" prefWidth="25.0" />
+      <Label fx:id="ProgUDA" layoutX="27.0" layoutY="32.0" text="PROG_UDA" />
+      <Label fx:id="DataInizio" layoutX="31.0" layoutY="300.0" text="DATA INIZIO" />
+      <TextField fx:id="TextFieldDataFine" layoutX="150.0" layoutY="334.0" minWidth="25.0" prefWidth="25.0" />
+      <TextField fx:id="TextFieldNote" layoutX="150.0" layoutY="372.0" minWidth="25.0" prefWidth="25.0" />
+      <TextField fx:id="TextFieldNDG" layoutX="150.0" layoutY="409.0" minWidth="25.0" prefWidth="25.0" />
+      <TextField fx:id="TextFieldCreDoc" layoutX="150.0" layoutY="448.0" minWidth="25.0" prefWidth="25.0" />
+      <TextField fx:id="TextFieldDenominazione" layoutX="150.0" layoutY="486.0" minWidth="25.0" prefWidth="25.0" />
+      <TextField fx:id="TextFieldNDG1" layoutX="150.0" layoutY="526.0" minWidth="25.0" prefWidth="25.0" />
+      <Label fx:id="DataFine" layoutX="30.0" layoutY="339.0" text="DATA FINE" />
+      <Label fx:id="Note" layoutX="31.0" layoutY="377.0" text="NOTE" />
+      <Label fx:id="NDG" layoutX="30.0" layoutY="414.0" text="NDG" />
+      <Label fx:id="CreDoc" layoutX="34.0" layoutY="453.0" text="CREDOC" />
+      <Label fx:id="Denominazione" layoutX="33.0" layoutY="491.0" text="DENOMINAZIONE" />
+      <Label fx:id="NDG1" layoutX="30.0" layoutY="531.0" text="NDG1" />
+      <Label fx:id="DescrizioneFiliale" layoutX="25.0" layoutY="70.0" text="DESCRIZIONE FILIALE" />
+      <Label fx:id="Dislociazione" layoutX="28.0" layoutY="109.0" text="FILIALE" />
+      <Label fx:id="DataInizio9" layoutX="29.0" layoutY="148.0" text="DISLOCAZIONE" />
+      <Label fx:id="Tipo_Doc" layoutX="29.0" layoutY="187.0" text="TIPO DOC" />
+      <Label fx:id="DescTipo" layoutX="28.0" layoutY="230.0" text="DESC TIPO" />
+      <Label fx:id="AnniCons" layoutX="29.0" layoutY="264.0" text="ANNI CONS" />
+   </children>
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+</Pane>
