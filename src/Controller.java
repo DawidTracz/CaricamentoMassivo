@@ -1,18 +1,21 @@
-
-
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.TextField;
-import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.security.Key;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,8 +36,32 @@ public class Controller {
 
 
     @FXML
-    public void saveButtonPressed(ActionEvent event) {
-        System.out.println("save world");
+    public void goButtonPressed(ActionEvent event) {
+        boolean hasEmpty = true;
+
+        for (Node node : pane.getChildren()) {
+            if (node instanceof TextField && ((TextField) node).getText().length() == 0) {
+                System.out.println(node.getId() + " nie jest wypelniony");
+
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("sample/PopUp2.fxml"));
+                Parent root1 = null;
+                try {
+                    root1 = (Parent) fxmlLoader.load();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root1));
+                stage.show();
+
+
+                hasEmpty = false;
+                break;
+            }
+        }
+        if (hasEmpty == true) {
+            System.out.println("save the world");
+        }
     }
 
 
@@ -49,18 +76,38 @@ public class Controller {
     }
 
     @FXML
-    private TextField textFieldProgrUda;
+    private Pane pane;
 
     @FXML
-    public void handleButton(ActionEvent event) {
+    public void handleKeyPressed(KeyEvent keyEvent)  {
+        for (Node node : pane.getChildren()) {
+            if ((node instanceof TextField) &&
+                    (((TextField) node).getText().length() > 1 ||
+                            ((TextField) node).getText().length() == 1 && !Character.isAlphabetic(((TextField) node).getText().charAt(0)))) {
+                System.out.println("za długie lub nie literka");
 
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("sample/PopUp.fxml"));
+                Parent root1 = null;
+                try {
+                    root1 = (Parent) fxmlLoader.load();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root1));
+                stage.show();
+                ((TextField) node).setText("");
+            }
+        }
     }
 
+
     @FXML
-    public void HandleKeyPressed(KeyEvent keyEvent) {
-        System.out.println("3" + keyEvent.getText());
-        System.out.println("1" + textFieldProgrUda.getText());
-        System.out.println("2" + textFieldProgrUda.textProperty());
+    private javafx.scene.control.Button popUp;
+
+    public void closeWindow(ActionEvent event) {
+        Stage stage = (Stage) popUp.getScene().getWindow();
+        stage.close();
     }
 
 
