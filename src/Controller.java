@@ -21,7 +21,13 @@ import java.util.logging.Logger;
 
 
 public class Controller {
+
     private Window stage;
+    @FXML
+    private Pane pane;
+    @FXML
+    private javafx.scene.control.Button popUp;
+
 
     @FXML
     public void buttonPressed(ActionEvent event) {
@@ -31,6 +37,10 @@ public class Controller {
         File selectedFile = fileChooser.showOpenDialog(stage);
         if (selectedFile != null) {
             openFile(selectedFile);
+            String path = selectedFile.getPath();
+            System.out.println(path);
+        
+
         }
     }
 
@@ -41,8 +51,8 @@ public class Controller {
 
         for (Node node : pane.getChildren()) {
             if (node instanceof TextField && ((TextField) node).getText().length() == 0) {
+                String unField = node.getId() + " nie jest wypelniony";
                 System.out.println(node.getId() + " nie jest wypelniony");
-
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("sample/PopUp2.fxml"));
                 Parent root1 = null;
                 try {
@@ -53,13 +63,24 @@ public class Controller {
                 Stage stage = new Stage();
                 stage.setScene(new Scene(root1));
                 stage.show();
-
-
                 hasEmpty = false;
                 break;
             }
         }
         if (hasEmpty == true) {
+            //working on excel
+
+
+
+
+
+
+
+
+
+
+
+
             System.out.println("save the world");
         }
     }
@@ -75,11 +96,10 @@ public class Controller {
         }
     }
 
-    @FXML
-    private Pane pane;
+
 
     @FXML
-    public void handleKeyPressed(KeyEvent keyEvent)  {
+    public void handleKeyPressed(KeyEvent keyEvent) {
         for (Node node : pane.getChildren()) {
             if ((node instanceof TextField) &&
                     (((TextField) node).getText().length() > 1 ||
@@ -101,15 +121,10 @@ public class Controller {
         }
     }
 
-
-    @FXML
-    private javafx.scene.control.Button popUp;
-
     public void closeWindow(ActionEvent event) {
         Stage stage = (Stage) popUp.getScene().getWindow();
         stage.close();
     }
-
 
 //    @FXML
 //    public static void udaLimit(final TextField tf, final int maxLength) {
@@ -123,7 +138,7 @@ public class Controller {
 //            }
 //        });
 //    }
-//        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+
 //        fileChooser.getExtensionFilters().addAll(
 //                new FileChooser.ExtensionFilter("All Images", "*.*"),
 //                new FileChooser.ExtensionFilter("JPG", "*.jpg"),
