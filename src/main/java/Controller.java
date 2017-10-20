@@ -161,8 +161,19 @@ public class Controller {
                                 //NDG
                                 //codice practica
                                 //NDG1
-                                stringProperLength = 16 - cell.toString().replace(".", "").replace("E", "").length();
-                                exportString += StringUtils.repeat("0", stringProperLength) + cell.toString().replace(".", "").replace("E", "") + "*";
+                                if (cell.toString().contains("E")) {
+
+                                    int index = cell.toString().indexOf("E")-1;
+
+                                    stringProperLength = 16 - cell.toString().replace(".", "").replace("E", "").length();
+                                    exportString += StringUtils.repeat("0", stringProperLength) + cell.toString().replace(".", "")
+                                            .replace("E", "").substring(0,index) + "*";
+                                } else {
+
+                                    stringProperLength = 16 - cell.toString().replace(".", "").length();
+                                    exportString += StringUtils.repeat("0", stringProperLength) + cell.toString().replace(".", "") + "*";
+                                }
+
                                 break;
                             case 12:
                                 stringProperLength = 64 - cell.toString().length();
