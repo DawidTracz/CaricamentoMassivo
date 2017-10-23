@@ -14,8 +14,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import javax.swing.*;
 import java.awt.Desktop;
 import java.io.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -153,27 +157,25 @@ public class Controller {
                             case 8:
                                 //Data INIZIO
                                 //DATA FINE
-                                exportString += cell.toString() + "*";
+
+                                DateFormat shortFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+                                DateFormat mediumFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+                                String cellWithDate = cell.toString();
+                                String shortDate = shortFormat.format(mediumFormat.parse(cellWithDate));
+
+                                exportString += shortDate + "*";
                                 break;
                             case 10:
                             case 11:
                             case 13:
+
                                 //NDG
                                 //codice practica
                                 //NDG1
-                                if (cell.toString().contains("E")) {
-
-                                    int index = cell.toString().indexOf("E")-1;
-
-                                    stringProperLength = 16 - cell.toString().replace(".", "").replace("E", "").length();
-                                    exportString += StringUtils.repeat("0", stringProperLength) + cell.toString().replace(".", "")
-                                            .replace("E", "").substring(0,index) + "*";
-                                } else {
-
-                                    stringProperLength = 16 - cell.toString().replace(".", "").length();
-                                    exportString += StringUtils.repeat("0", stringProperLength) + cell.toString().replace(".", "") + "*";
-                                }
-
+                                //16 znakow
+                                String bla = "" + Double.valueOf(cell.toString()).longValue();
+                                stringProperLength = 16 - bla.length();
+                                exportString += StringUtils.repeat("0", stringProperLength) + Double.valueOf(cell.toString()).longValue() + "*";
                                 break;
                             case 12:
                                 stringProperLength = 64 - cell.toString().length();
@@ -216,6 +218,8 @@ public class Controller {
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
                 e.printStackTrace();
             }
 
