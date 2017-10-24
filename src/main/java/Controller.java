@@ -79,8 +79,12 @@ public class Controller {
                 while (iterator.hasNext()) {
                     Row currentRow = iterator.next();
                     for (int i = 0; i < 14; i++) {
+
+
                         textField = (TextField) pane.lookup("#textField" + i);
+
                         int colToCopy = (int) textField.getText().toLowerCase().charAt(0) - 97;
+
                         Cell cell = currentRow.getCell(colToCopy);
                         int stringProperLength;
                         String alertMSG = "";
@@ -168,14 +172,18 @@ public class Controller {
                             case 10:
                             case 11:
                             case 13:
-
                                 //NDG
                                 //codice practica
                                 //NDG1
                                 //16 znakow
-                                String bla = "" + Double.valueOf(cell.toString()).longValue();
-                                stringProperLength = 16 - bla.length();
-                                exportString += StringUtils.repeat("0", stringProperLength) + Double.valueOf(cell.toString()).longValue() + "*";
+                                if (textField.equals(0)) {
+                                    exportString += StringUtils.repeat("0", 16) + "*";
+
+                                } else {
+                                    String bla = "" + Double.valueOf(cell.toString()).longValue();
+                                    stringProperLength = 16 - bla.length();
+                                    exportString += StringUtils.repeat("0", stringProperLength) + Double.valueOf(cell.toString()).longValue() + "*";
+                                }
                                 break;
                             case 12:
                                 stringProperLength = 64 - cell.toString().length();
@@ -244,16 +252,17 @@ public class Controller {
         for (Node node : pane.getChildren()) {
             if (node instanceof TextField) {
                 if ((((TextField) node).getText().length() > 1 ||
-                        ((TextField) node).getText().length() == 1 && !(((TextField) node).getText().toLowerCase().matches("[a-n]")))) {
+                        ((TextField) node).getText().length() == 1 && !(((TextField) node).getText().toLowerCase().matches("[a-n]|[0]")))) {
+
                     System.out.println("za długie lub nie literka");
-                    String unField = "You can put only letters from a to n !!!!! A to N are OK as well:)";
+                    String unField = "You can put only letters from a to n or 0!!!!! A to N are OK as well:)";
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setHeaderText(unField);
                     alert.show();
                     ((TextField) node).setText("");
                     break;
                 } else if (((TextField) node).getText().length() == 1) {
-                    if (set.contains(((TextField) node).getText().charAt(0))) {
+                    if (set.contains(((TextField) node).getText().charAt(0)) && !(((TextField) node).getText().matches("[0]"))) {
                         String duplicate = "You duplicated values";
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setHeaderText(duplicate);

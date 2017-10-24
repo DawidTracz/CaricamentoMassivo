@@ -120,11 +120,10 @@
       <file leaf-file-name="Controller.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/Controller.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="338">
-              <caret line="184" column="34" lean-forward="false" selection-start-line="184" selection-start-column="34" selection-end-line="184" selection-end-column="34" />
+            <state relative-caret-position="408">
+              <caret line="120" column="38" lean-forward="true" selection-start-line="120" selection-start-column="38" selection-end-line="120" selection-end-column="38" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#6442#6453#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -216,6 +215,7 @@
       <find>path</find>
       <find>node</find>
       <find>lower</find>
+      <find>stringproper</find>
     </findStrings>
   </component>
   <component name="FindManager">
@@ -254,7 +254,7 @@
     </option>
   </component>
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" extendedState="1">
     <option name="x" value="1681" />
     <option name="y" value="82" />
     <option name="width" value="1678" />
@@ -506,7 +506,7 @@
     <option name="totallyTimeSpent" value="1302000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1681" y="82" width="1678" height="967" extended-state="0" />
+    <frame x="1681" y="82" width="1678" height="967" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -660,7 +660,6 @@
           <caret line="173" column="81" lean-forward="true" selection-start-line="173" selection-start-column="81" selection-end-line="173" selection-end-column="81" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6442#6453#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -743,7 +742,6 @@
           <caret line="149" column="52" lean-forward="true" selection-start-line="149" selection-start-column="52" selection-end-line="149" selection-end-column="52" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6442#6453#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -786,7 +784,6 @@
           <caret line="7" column="9" lean-forward="false" selection-start-line="7" selection-start-column="9" selection-end-line="60" selection-end-column="11" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6442#6453#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -951,11 +948,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/Controller.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="338">
-          <caret line="184" column="34" lean-forward="false" selection-start-line="184" selection-start-column="34" selection-end-line="184" selection-end-column="34" />
+        <state relative-caret-position="408">
+          <caret line="120" column="38" lean-forward="true" selection-start-line="120" selection-start-column="38" selection-end-line="120" selection-end-column="38" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6442#6453#0" expanded="false" />
           </folding>
         </state>
       </provider>
