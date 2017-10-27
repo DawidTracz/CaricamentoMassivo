@@ -17,10 +17,7 @@ import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,6 +53,7 @@ public class Controller {
     public void goButtonPressed(ActionEvent event) {
         boolean hasEmpty = true;
         String exportString = "";
+        List<String> checkZeroList = new LinkedList<>();
 
         for (Node node : pane.getChildren()) {
             if (node instanceof TextField && ((TextField) node).getText().length() == 0) {
@@ -67,7 +65,29 @@ public class Controller {
                 hasEmpty = false;
                 break;
             }
+            textField = (TextField) pane.lookup("#textField0");
+            checkZeroList.add(textField.getText());
+            textField = (TextField) pane.lookup("#textField2");
+            checkZeroList.add(textField.getText());
+            textField = (TextField) pane.lookup("#textField4");
+            checkZeroList.add(textField.getText());
+            textField = (TextField) pane.lookup("#textField6");
+            checkZeroList.add(textField.getText());
+            textField = (TextField) pane.lookup("#textField7");
+            checkZeroList.add(textField.getText());
+            textField = (TextField) pane.lookup("#textField8");
+
+            if (checkZeroList.contains("0")) {
+                String unField = "PROGR_UDA \n FILIALE \n TIPO_DOC \n ANNI_CONS \n DATA INIZIO \n DATA FINE        cannot posses value '0', change it";
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText(unField);
+                alert.show();
+                hasEmpty = false;
+                break;
+            }
         }
+
+
         if (hasEmpty == true) {
             try {
                 FileInputStream excelFile = new FileInputStream(new File(path));
@@ -76,15 +96,12 @@ public class Controller {
                 Iterator<Row> iterator = datatypeSheet.iterator();
                 iterator.next();
                 Boolean mainAllert = true;
+                Boolean caseCheck = true;
                 while (iterator.hasNext()) {
                     Row currentRow = iterator.next();
                     for (int i = 0; i < 14; i++) {
-
-
                         textField = (TextField) pane.lookup("#textField" + i);
-
                         int colToCopy = (int) textField.getText().toLowerCase().charAt(0) - 97;
-
                         Cell cell = currentRow.getCell(colToCopy);
                         int stringProperLength;
                         String alertMSG = "";
@@ -103,15 +120,20 @@ public class Controller {
                                 break;
                             case 1:
                                 //DESCRIZIONE FILLIALE
-                                stringProperLength = 50 - cell.toString().length();
-                                exportString += cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*";
 //                                if (exportString.length() > 52) {
 //                                    alertMSG = "Some Descrizione Filliale is to long";
 //                                    alert.setHeaderText(alertMSG);
 //                                    alert.show();
 //                                    mainAllert = false;
+//                                    caseCheck = false;
+//
+//
 //                                    break;
 //                                }
+
+                                stringProperLength = 50 - cell.toString().length();
+                                exportString += cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*";
+
                                 break;
                             case 2:
                             case 4:
@@ -230,9 +252,7 @@ public class Controller {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
         }
-
     }
 
     @FXML
@@ -248,7 +268,9 @@ public class Controller {
 
     @FXML
     public void handleKeyPressed(KeyEvent keyEvent) {
+
         Set<Character> set = new HashSet<Character>();
+
         for (Node node : pane.getChildren()) {
             if (node instanceof TextField) {
                 if ((((TextField) node).getText().length() > 1 ||
@@ -275,5 +297,6 @@ public class Controller {
             }
         }
     }
+
 }
 
