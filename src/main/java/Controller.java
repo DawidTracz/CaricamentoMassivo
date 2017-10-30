@@ -14,6 +14,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import javax.swing.*;
 import java.awt.Desktop;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,8 +27,6 @@ public class Controller {
     private Window stage;
     @FXML
     private Pane pane;
-    @FXML
-    private javafx.scene.control.Button popUp;
     String path = "";
     @FXML
     private Node node;
@@ -52,7 +52,7 @@ public class Controller {
     @FXML
     public void goButtonPressed(ActionEvent event) {
         boolean hasEmpty = true;
-        String exportString = "";
+        StringBuilder exportString = new StringBuilder("");
         List<String> checkZeroList = new LinkedList<>();
 
         for (Node node : pane.getChildren()) {
@@ -116,7 +116,7 @@ public class Controller {
                                     mainAllert = false;
                                     break;
                                 }
-                                exportString += cell.toString().substring(0, cell.toString().length() - 2) + "*";
+                                exportString.append(cell.toString().substring(0, cell.toString().length() - 2) + "*");
                                 break;
                             case 1:
                                 //DESCRIZIONE FILLIALE
@@ -132,7 +132,7 @@ public class Controller {
 //                                }
 
                                 stringProperLength = 50 - cell.toString().length();
-                                exportString += cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*";
+                                exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
 
                                 break;
                             case 2:
@@ -140,7 +140,7 @@ public class Controller {
                                 //Filiale
                                 //TipoDoc
                                 stringProperLength = 5 - cell.toString().substring(0, cell.toString().length() - 2).length();
-                                exportString += StringUtils.repeat("0", stringProperLength) + cell.toString().substring(0, cell.toString().length() - 2) + "*";
+                                exportString.append(StringUtils.repeat("0", stringProperLength) + cell.toString().substring(0, cell.toString().length() - 2) + "*");
 //                                if (exportString.length() > 6) {
 //                                    alertMSG = "Some Descrizione Filliale is to long";
 //                                    alert.setHeaderText(alertMSG);
@@ -152,7 +152,7 @@ public class Controller {
                             case 3:
                                 //Dislocazione
                                 stringProperLength = 3 - cell.toString().length();
-                                exportString += StringUtils.repeat(" ", stringProperLength) + cell.toString() + "*";
+                                exportString.append(StringUtils.repeat(" ", stringProperLength) + cell.toString() + "*");
 //                                if (exportString.length() > 4) {
 //                                    alertMSG = "Some Dislocazione is to long";
 //                                    alert.setHeaderText(alertMSG);
@@ -166,11 +166,11 @@ public class Controller {
                                 //DESC TIPO
                                 //NOTE
                                 stringProperLength = 80 - cell.toString().length();
-                                exportString += cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*";
+                                exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
                                 break;
                             case 6:
                                 //ANNI CONS
-                                exportString += cell.toString().substring(0, cell.toString().length() - 2) + "*";
+                                exportString.append(cell.toString().substring(0, cell.toString().length() - 2) + "*");
 //                                if (exportString.length() > 3) {
 //                                    alertMSG = "ANNI CONSERVAZIONI is to long";
 //                                    alert.setHeaderText(alertMSG);
@@ -189,7 +189,7 @@ public class Controller {
                                 String cellWithDate = cell.toString();
                                 String shortDate = shortFormat.format(mediumFormat.parse(cellWithDate));
 
-                                exportString += shortDate + "*";
+                                exportString.append(shortDate + "*");
                                 break;
                             case 10:
                             case 11:
@@ -199,17 +199,17 @@ public class Controller {
                                 //NDG1
                                 //16 znakow
                                 if (textField.equals(0)) {
-                                    exportString += StringUtils.repeat("0", 16) + "*";
+                                    exportString.append(StringUtils.repeat("0", 16) + "*");
 
                                 } else {
                                     String bla = "" + Double.valueOf(cell.toString()).longValue();
                                     stringProperLength = 16 - bla.length();
-                                    exportString += StringUtils.repeat("0", stringProperLength) + Double.valueOf(cell.toString()).longValue() + "*";
+                                    exportString.append(StringUtils.repeat("0", stringProperLength) + Double.valueOf(cell.toString()).longValue() + "*");
                                 }
                                 break;
                             case 12:
                                 stringProperLength = 64 - cell.toString().length();
-                                exportString += cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*";
+                                exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
 //                                if (exportString.length() > 65) {
 //                                    alertMSG = "ANNI CONSERVAZIONI is to long";
 //                                    alert.setHeaderText(alertMSG);
@@ -226,20 +226,18 @@ public class Controller {
                     if (!mainAllert) {
                         break;
                     }
-                    exportString = exportString.substring(0, exportString.length() - 1) + '\n';
+                    exportString.deleteCharAt(exportString.length()-1).append(System.lineSeparator());
+
                 }
                 if (mainAllert) {
                     JFileChooser chooser = new JFileChooser();
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     int option = chooser.showSaveDialog(null);
                     File path2 = new File(chooser.getSelectedFile().getPath());
+                    String path2String = path2.toString()+"\\test.txt";
                     if (option == JFileChooser.APPROVE_OPTION) {
                         try {
-                            File file = new File(path2 + "/" + "test1.txt");
-                            FileWriter fileWriter = new FileWriter(file);
-                            fileWriter.write(exportString);
-                            fileWriter.flush();
-                            fileWriter.close();
+                            Files.write(Paths.get(path2String), exportString.toString().getBytes());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
