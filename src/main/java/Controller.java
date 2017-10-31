@@ -35,7 +35,6 @@ public class Controller {
 
     @FXML
     public void buttonPressed(ActionEvent event) {
-        System.out.println("Hello Wordld");
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Znajdź plik");
         fileChooser.getExtensionFilters().addAll(
@@ -53,8 +52,7 @@ public class Controller {
     public void goButtonPressed(ActionEvent event) {
         boolean hasEmpty = true;
         StringBuilder exportString = new StringBuilder("");
-        List<String> checkZeroList = new LinkedList<>();
-
+        StringBuilder inputString = new StringBuilder("");
         for (Node node : pane.getChildren()) {
             if (node instanceof TextField && ((TextField) node).getText().length() == 0) {
                 String unField = node.getId() + " nie jest wypelniony";
@@ -65,19 +63,18 @@ public class Controller {
                 hasEmpty = false;
                 break;
             }
-            textField = (TextField) pane.lookup("#textField0");
-            checkZeroList.add(textField.getText());
-            textField = (TextField) pane.lookup("#textField2");
-            checkZeroList.add(textField.getText());
-            textField = (TextField) pane.lookup("#textField4");
-            checkZeroList.add(textField.getText());
-            textField = (TextField) pane.lookup("#textField6");
-            checkZeroList.add(textField.getText());
-            textField = (TextField) pane.lookup("#textField7");
-            checkZeroList.add(textField.getText());
-            textField = (TextField) pane.lookup("#textField8");
+            for (int i = 0; i < 14; i++) {
+                textField = (TextField) pane.lookup("#textField" + i);
+                inputString.append(textField.getText().toLowerCase());
+            }
 
-            if (checkZeroList.contains("0")) {
+
+            if (inputString.charAt(0) == '0' ||
+                    inputString.charAt(2) == '0' ||
+                    inputString.charAt(4) == '0' ||
+                    inputString.charAt(6) == '0' ||
+                    inputString.charAt(7) == '0' ||
+                    inputString.charAt(8) == '0') {
                 String unField = "PROGR_UDA \n FILIALE \n TIPO_DOC \n ANNI_CONS \n DATA INIZIO \n DATA FINE        cannot posses value '0', change it";
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText(unField);
@@ -96,94 +93,114 @@ public class Controller {
                 Iterator<Row> iterator = datatypeSheet.iterator();
                 iterator.next();
                 Boolean mainAllert = true;
-                Boolean caseCheck = true;
-                while (iterator.hasNext()) {
+
+                while (iterator.hasNext() && mainAllert == true) {
                     Row currentRow = iterator.next();
                     for (int i = 0; i < 14; i++) {
-                        textField = (TextField) pane.lookup("#textField" + i);
-                        int colToCopy = (int) textField.getText().toLowerCase().charAt(0) - 97;
+                        int colToCopy = inputString.charAt(i) - 97;
                         Cell cell = currentRow.getCell(colToCopy);
                         int stringProperLength;
-                        String alertMSG = "";
+                        String alertMSG;
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         switch (i) {
                             case 0:
                                 //PROG_UDA
-                                if (cell.toString().substring(0, cell.toString().length() - 2).length() != 7) {
-                                    alertMSG = "At least 1 PROGR UDA does not have 7 symbols";
+                                if ((int) cell.getNumericCellValue() > 9999999 || (int) cell.getNumericCellValue() < 1000000 || cell.toString().length() > 9 || cell.toString().length() < 7) { //symbols as 1234567.0
+                                    alertMSG = "UDA cannot have more or less than 7 digits";
                                     alert.setHeaderText(alertMSG);
                                     alert.show();
                                     mainAllert = false;
                                     break;
+                                } else if (cell.toString().length() == 9) {
+                                    exportString.append(String.valueOf((int) cell.getNumericCellValue()) + "*");
+                                    break;
+                                } else if (cell.toString().length() == 7) {
+                                    exportString.append(cell.toString() + "*");
+                                    break;
                                 }
-                                exportString.append(cell.toString().substring(0, cell.toString().length() - 2) + "*");
-                                break;
                             case 1:
                                 //DESCRIZIONE FILLIALE
-//                                if (exportString.length() > 52) {
-//                                    alertMSG = "Some Descrizione Filliale is to long";
-//                                    alert.setHeaderText(alertMSG);
-//                                    alert.show();
-//                                    mainAllert = false;
-//                                    caseCheck = false;
-//
-//
-//                                    break;
-//                                }
-
-                                stringProperLength = 50 - cell.toString().length();
-                                exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
-
+                                if (cell.toString().length() > 50) {
+                                    alertMSG = "Some Descrizione Filliale is to long";
+                                    alert.setHeaderText(alertMSG);
+                                    alert.show();
+                                    mainAllert = false;
+                                    break;
+                                } else {
+                                    stringProperLength = 50 - cell.toString().length();
+                                    exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
+                                }
                                 break;
                             case 2:
                             case 4:
                                 //Filiale
                                 //TipoDoc
-                                stringProperLength = 5 - cell.toString().substring(0, cell.toString().length() - 2).length();
-                                exportString.append(StringUtils.repeat("0", stringProperLength) + cell.toString().substring(0, cell.toString().length() - 2) + "*");
-//                                if (exportString.length() > 6) {
-//                                    alertMSG = "Some Descrizione Filliale is to long";
-//                                    alert.setHeaderText(alertMSG);
-//                                    alert.show();
-//                                    mainAllert = false;
-//                                    break;
-//                                }
-                                break;
+                                if ((int) cell.getNumericCellValue() > 99999) {
+                                    alertMSG = "TipoDOC and Filiale can have maximum 5 numbers";
+                                    alert.setHeaderText(alertMSG);
+                                    alert.show();
+                                    mainAllert = false;
+                                    break;
+                                } else {
+                                    stringProperLength = 5 - String.valueOf((int) cell.getNumericCellValue()).length();
+                                    exportString.append(StringUtils.repeat("0", stringProperLength) + String.valueOf((int) cell.getNumericCellValue()) + "*");
+
+                                    break;
+                                }
                             case 3:
                                 //Dislocazione
-                                stringProperLength = 3 - cell.toString().length();
-                                exportString.append(StringUtils.repeat(" ", stringProperLength) + cell.toString() + "*");
-//                                if (exportString.length() > 4) {
-//                                    alertMSG = "Some Dislocazione is to long";
-//                                    alert.setHeaderText(alertMSG);
-//                                    alert.show();
-//                                    mainAllert = false;
-//                                    break;
-//                                }
-                                break;
+
+                                if (inputString.charAt(i) == 0) {
+                                    exportString.append(StringUtils.repeat(" ", 3) + "*");
+                                    break;
+                                } else if (cell.getStringCellValue().length() > 3) {
+                                    alertMSG = "DISLOCAZIONE can have maximum 3 numbers";
+                                    alert.setHeaderText(alertMSG);
+                                    alert.show();
+                                    mainAllert = false;
+                                    break;
+                                } else {
+                                    stringProperLength = 3 - cell.getStringCellValue().length();
+                                    exportString.append(StringUtils.repeat("0", stringProperLength) + cell.getStringCellValue() + "*");
+
+                                    break;
+                                }
                             case 5:
                             case 9:
                                 //DESC TIPO
                                 //NOTE
-                                stringProperLength = 80 - cell.toString().length();
-                                exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
-                                break;
+                                if (inputString.charAt(i) == 0) {
+                                    exportString.append(StringUtils.repeat(" ", 80) + "*");
+                                    break;
+                                } else if (cell.toString().length() > 80) {
+                                    alertMSG = "Some DescTipo or Note is too long";
+                                    alert.setHeaderText(alertMSG);
+                                    alert.show();
+                                    mainAllert = false;
+                                    break;
+                                } else {
+                                    stringProperLength = 80 - cell.toString().length();
+                                    exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
+                                    break;
+                                }
                             case 6:
                                 //ANNI CONS
-                                exportString.append(cell.toString().substring(0, cell.toString().length() - 2) + "*");
-//                                if (exportString.length() > 3) {
-//                                    alertMSG = "ANNI CONSERVAZIONI is to long";
-//                                    alert.setHeaderText(alertMSG);
-//                                    alert.show();
-//                                    mainAllert = false;
-//                                    break;
-//                                }
-                                break;
+                                if ((int) cell.getNumericCellValue() > 99) {
+                                    alertMSG = "ANNI CONSERVATIONI CAN BE MAX 2 NUMBERED";
+                                    alert.setHeaderText(alertMSG);
+                                    alert.show();
+                                    mainAllert = false;
+                                    break;
+                                } else {
+                                    stringProperLength = 2 - String.valueOf((int) cell.getNumericCellValue()).length();
+                                    exportString.append(StringUtils.repeat("0", stringProperLength) + String.valueOf((int) cell.getNumericCellValue()) + "*");
+
+                                    break;
+                                }
                             case 7:
                             case 8:
                                 //Data INIZIO
                                 //DATA FINE
-
                                 DateFormat shortFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
                                 DateFormat mediumFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
                                 String cellWithDate = cell.toString();
@@ -198,26 +215,30 @@ public class Controller {
                                 //codice practica
                                 //NDG1
                                 //16 znakow
-                                if (textField.equals(0)) {
+                                if (inputString.charAt(i) == 0) {
                                     exportString.append(StringUtils.repeat("0", 16) + "*");
-
+                                    break;
                                 } else {
-                                    String bla = "" + Double.valueOf(cell.toString()).longValue();
-                                    stringProperLength = 16 - bla.length();
-                                    exportString.append(StringUtils.repeat("0", stringProperLength) + Double.valueOf(cell.toString()).longValue() + "*");
+                                    stringProperLength = 16 - String.valueOf(((long) cell.getNumericCellValue())).length();
+                                    exportString.append(StringUtils.repeat("0", stringProperLength) + ((long) cell.getNumericCellValue()) + "*");
+                                    break;
                                 }
-                                break;
                             case 12:
-                                stringProperLength = 64 - cell.toString().length();
-                                exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
-//                                if (exportString.length() > 65) {
-//                                    alertMSG = "ANNI CONSERVAZIONI is to long";
-//                                    alert.setHeaderText(alertMSG);
-//                                    alert.show();
-//                                    mainAllert = false;
-//                                    break;
-//                                }
-                                break;
+                                //Denominazione
+                                if (inputString.charAt(i) == 0) {
+                                    exportString.append(StringUtils.repeat(" ", 64) + "*");
+                                    break;
+                                } else if (cell.toString().length() > 64) {
+                                    alertMSG = "DENOMINAZIONE może mieć max 64 znaki";
+                                    alert.setHeaderText(alertMSG);
+                                    alert.show();
+                                    mainAllert = false;
+                                    break;
+                                } else {
+                                    stringProperLength = 64 - cell.toString().length();
+                                    exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
+                                    break;
+                                }
                         }
                         if (!mainAllert) {
                             break;
@@ -226,15 +247,14 @@ public class Controller {
                     if (!mainAllert) {
                         break;
                     }
-                    exportString.deleteCharAt(exportString.length()-1).append(System.lineSeparator());
-
+                    exportString.deleteCharAt(exportString.length() - 1).append(System.lineSeparator());
                 }
                 if (mainAllert) {
                     JFileChooser chooser = new JFileChooser();
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     int option = chooser.showSaveDialog(null);
                     File path2 = new File(chooser.getSelectedFile().getPath());
-                    String path2String = path2.toString()+"\\test.txt";
+                    String path2String = path2.toString() + "\\test.txt";
                     if (option == JFileChooser.APPROVE_OPTION) {
                         try {
                             Files.write(Paths.get(path2String), exportString.toString().getBytes());
@@ -274,7 +294,6 @@ public class Controller {
                 if ((((TextField) node).getText().length() > 1 ||
                         ((TextField) node).getText().length() == 1 && !(((TextField) node).getText().toLowerCase().matches("[a-n]|[0]")))) {
 
-                    System.out.println("za długie lub nie literka");
                     String unField = "You can put only letters from a to n or 0!!!!! A to N are OK as well:)";
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setHeaderText(unField);
