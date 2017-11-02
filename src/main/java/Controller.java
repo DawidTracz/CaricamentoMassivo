@@ -1,7 +1,11 @@
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
@@ -29,9 +33,11 @@ public class Controller {
     private Pane pane;
     String path = "";
     @FXML
-    private Node node;
-    @FXML
     private TextField textField;
+    @FXML
+    private ProgressBar progressBar;
+
+    Task copyWorker;
 
     @FXML
     public void buttonPressed(ActionEvent event) {
@@ -53,30 +59,16 @@ public class Controller {
         boolean hasEmpty = true;
         StringBuilder exportString = new StringBuilder("");
         StringBuilder inputString = new StringBuilder("");
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        String alertMSG;
+
+
+
         for (Node node : pane.getChildren()) {
             if (node instanceof TextField && ((TextField) node).getText().length() == 0) {
                 String unField = node.getId() + " nie jest wypelniony";
                 System.out.println(node.getId() + " nie jest wypelniony");
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setHeaderText(unField);
-                alert.show();
-                hasEmpty = false;
-                break;
-            }
-            for (int i = 0; i < 14; i++) {
-                textField = (TextField) pane.lookup("#textField" + i);
-                inputString.append(textField.getText().toLowerCase());
-            }
-
-
-            if (inputString.charAt(0) == '0' ||
-                    inputString.charAt(2) == '0' ||
-                    inputString.charAt(4) == '0' ||
-                    inputString.charAt(6) == '0' ||
-                    inputString.charAt(7) == '0' ||
-                    inputString.charAt(8) == '0') {
-                String unField = "PROGR_UDA \n FILIALE \n TIPO_DOC \n ANNI_CONS \n DATA INIZIO \n DATA FINE        cannot posses value '0', change it";
-                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText(unField);
                 alert.show();
                 hasEmpty = false;
@@ -84,8 +76,32 @@ public class Controller {
             }
         }
 
+        for (int i = 0; i < 14; i++) {
+            textField = (TextField) pane.lookup("#textField" + i);
+            inputString.append(textField.getText().toLowerCase());
+        }
+
+
+        if (inputString.charAt(0) == '0' ||
+                inputString.charAt(2) == '0' ||
+                inputString.charAt(4) == '0' ||
+                inputString.charAt(6) == '0' ||
+                inputString.charAt(7) == '0' ||
+                inputString.charAt(8) == '0') {
+            String unField = "Textfields with PROGR_UDA \n FILIALE \n TIPO_DOC \n ANNI_CONS \n DATA INIZIO \n DATA FINE        cannot posses value '0', change it";
+            alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(unField);
+            alert.show();
+            hasEmpty = false;
+        }
+
 
         if (hasEmpty == true) {
+            DateFormat shortFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+            DateFormat mediumFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+            Date dateInizio = new Date();
+            Date dateFine = new Date();
+
             try {
                 FileInputStream excelFile = new FileInputStream(new File(path));
                 Workbook workbook = new XSSFWorkbook(excelFile);
@@ -98,13 +114,13 @@ public class Controller {
                     Row currentRow = iterator.next();
                     for (int i = 0; i < 14; i++) {
                         int colToCopy = inputString.charAt(i) - 97;
-                        Cell cell = currentRow.getCell(colToCopy);
+                        Cell cell;
                         int stringProperLength;
-                        String alertMSG;
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
+
                         switch (i) {
                             case 0:
                                 //PROG_UDA
+                                cell = currentRow.getCell(colToCopy);
                                 if ((int) cell.getNumericCellValue() > 9999999 || (int) cell.getNumericCellValue() < 1000000 || cell.toString().length() > 9 || cell.toString().length() < 7) { //symbols as 1234567.0
                                     alertMSG = "UDA cannot have more or less than 7 digits";
                                     alert.setHeaderText(alertMSG);
@@ -120,21 +136,29 @@ public class Controller {
                                 }
                             case 1:
                                 //DESCRIZIONE FILLIALE
-                                if (cell.toString().length() > 50) {
-                                    alertMSG = "Some Descrizione Filliale is to long";
-                                    alert.setHeaderText(alertMSG);
-                                    alert.show();
-                                    mainAllert = false;
+                                if (inputString.charAt(i) == '0') {
+                                    exportString.append(StringUtils.repeat(" ", 3) + "50");
                                     break;
                                 } else {
-                                    stringProperLength = 50 - cell.toString().length();
-                                    exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
+                                    cell = currentRow.getCell(colToCopy);
+                                    if (cell.toString().length() > 50) {
+                                        alertMSG = "Some Descrizione Filliale is to long";
+                                        alert.setHeaderText(alertMSG);
+                                        alert.show();
+                                        mainAllert = false;
+                                        break;
+                                    } else {
+                                        stringProperLength = 50 - cell.toString().length();
+                                        exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
+                                        break;
+                                    }
                                 }
-                                break;
+
                             case 2:
                             case 4:
                                 //Filiale
                                 //TipoDoc
+                                cell = currentRow.getCell(colToCopy);
                                 if ((int) cell.getNumericCellValue() > 99999) {
                                     alertMSG = "TipoDOC and Filiale can have maximum 5 numbers";
                                     alert.setHeaderText(alertMSG);
@@ -150,41 +174,49 @@ public class Controller {
                             case 3:
                                 //Dislocazione
 
-                                if (inputString.charAt(i) == 0) {
+                                if (inputString.charAt(i) == '0') {
                                     exportString.append(StringUtils.repeat(" ", 3) + "*");
                                     break;
-                                } else if (cell.getStringCellValue().length() > 3) {
-                                    alertMSG = "DISLOCAZIONE can have maximum 3 numbers";
-                                    alert.setHeaderText(alertMSG);
-                                    alert.show();
-                                    mainAllert = false;
-                                    break;
                                 } else {
-                                    stringProperLength = 3 - cell.getStringCellValue().length();
-                                    exportString.append(StringUtils.repeat("0", stringProperLength) + cell.getStringCellValue() + "*");
+                                    cell = currentRow.getCell(colToCopy);
+                                    if (cell.getStringCellValue().length() > 3) {
+                                        alertMSG = "DISLOCAZIONE can have maximum 3 numbers";
+                                        alert.setHeaderText(alertMSG);
+                                        alert.show();
+                                        mainAllert = false;
+                                        break;
+                                    } else {
+                                        stringProperLength = 3 - cell.getStringCellValue().length();
+                                        exportString.append(StringUtils.repeat("0", stringProperLength) + cell.getStringCellValue() + "*");
 
-                                    break;
+                                        break;
+                                    }
                                 }
+
                             case 5:
                             case 9:
                                 //DESC TIPO
                                 //NOTE
-                                if (inputString.charAt(i) == 0) {
+                                if (inputString.charAt(i) == '0') {
                                     exportString.append(StringUtils.repeat(" ", 80) + "*");
                                     break;
-                                } else if (cell.toString().length() > 80) {
-                                    alertMSG = "Some DescTipo or Note is too long";
-                                    alert.setHeaderText(alertMSG);
-                                    alert.show();
-                                    mainAllert = false;
-                                    break;
                                 } else {
-                                    stringProperLength = 80 - cell.toString().length();
-                                    exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
-                                    break;
+                                    cell = currentRow.getCell(colToCopy);
+                                    if (cell.toString().length() > 80) {
+                                        alertMSG = "Some DescTipo or Note is too long";
+                                        alert.setHeaderText(alertMSG);
+                                        alert.show();
+                                        mainAllert = false;
+                                        break;
+                                    } else {
+                                        stringProperLength = 80 - cell.toString().length();
+                                        exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
+                                        break;
+                                    }
                                 }
                             case 6:
                                 //ANNI CONS
+                                cell = currentRow.getCell(colToCopy);
                                 if ((int) cell.getNumericCellValue() > 99) {
                                     alertMSG = "ANNI CONSERVATIONI CAN BE MAX 2 NUMBERED";
                                     alert.setHeaderText(alertMSG);
@@ -198,15 +230,29 @@ public class Controller {
                                     break;
                                 }
                             case 7:
-                            case 8:
                                 //Data INIZIO
-                                //DATA FINE
-                                DateFormat shortFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
-                                DateFormat mediumFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
-                                String cellWithDate = cell.toString();
-                                String shortDate = shortFormat.format(mediumFormat.parse(cellWithDate));
 
-                                exportString.append(shortDate + "*");
+                                cell = currentRow.getCell(colToCopy);
+                                String cellWithDateInizio = cell.toString();
+                                dateInizio = mediumFormat.parse(cellWithDateInizio);
+                                String shortDateInizio = shortFormat.format(mediumFormat.parse(cellWithDateInizio));
+                                exportString.append(shortDateInizio + "*");
+                                break;
+                            case 8:
+                                //DATA FINE
+                                cell = currentRow.getCell(colToCopy);
+                                String cellWithDateFine = cell.toString();
+                                dateFine = mediumFormat.parse(cellWithDateFine);
+                                String shortDateFine = shortFormat.format(mediumFormat.parse(cellWithDateFine));
+
+                                if (dateInizio.after(dateFine)) {
+                                    alertMSG = "Data Fine is before Data Inizio ";
+                                    alert.setHeaderText(alertMSG);
+                                    alert.show();
+                                    mainAllert = false;
+                                } else {
+                                    exportString.append(shortDateFine + "*");
+                                }
                                 break;
                             case 10:
                             case 11:
@@ -215,29 +261,35 @@ public class Controller {
                                 //codice practica
                                 //NDG1
                                 //16 znakow
-                                if (inputString.charAt(i) == 0) {
+                                if (inputString.charAt(i) == '0') {
                                     exportString.append(StringUtils.repeat("0", 16) + "*");
                                     break;
                                 } else {
-                                    stringProperLength = 16 - String.valueOf(((long) cell.getNumericCellValue())).length();
-                                    exportString.append(StringUtils.repeat("0", stringProperLength) + ((long) cell.getNumericCellValue()) + "*");
-                                    break;
+                                    cell = currentRow.getCell(colToCopy);
+                                    {
+                                        stringProperLength = 16 - String.valueOf(((long) cell.getNumericCellValue())).length();
+                                        exportString.append(StringUtils.repeat("0", stringProperLength) + ((long) cell.getNumericCellValue()) + "*");
+                                        break;
+                                    }
                                 }
                             case 12:
                                 //Denominazione
-                                if (inputString.charAt(i) == 0) {
+                                if (inputString.charAt(i) == '0') {
                                     exportString.append(StringUtils.repeat(" ", 64) + "*");
                                     break;
-                                } else if (cell.toString().length() > 64) {
-                                    alertMSG = "DENOMINAZIONE może mieć max 64 znaki";
-                                    alert.setHeaderText(alertMSG);
-                                    alert.show();
-                                    mainAllert = false;
-                                    break;
                                 } else {
-                                    stringProperLength = 64 - cell.toString().length();
-                                    exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
-                                    break;
+                                    cell = currentRow.getCell(colToCopy);
+                                    if (cell.toString().length() > 64) {
+                                        alertMSG = "DENOMINAZIONE może mieć max 64 znaki";
+                                        alert.setHeaderText(alertMSG);
+                                        alert.show();
+                                        mainAllert = false;
+                                        break;
+                                    } else {
+                                        stringProperLength = 64 - cell.toString().length();
+                                        exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
+                                        break;
+                                    }
                                 }
                         }
                         if (!mainAllert) {
@@ -254,7 +306,7 @@ public class Controller {
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     int option = chooser.showSaveDialog(null);
                     File path2 = new File(chooser.getSelectedFile().getPath());
-                    String path2String = path2.toString() + "\\test.txt";
+                    String path2String = path2.toString() + "\\C0.CRV.SAD.SAD1CAC0.FILEUDAI.txt";
                     if (option == JFileChooser.APPROVE_OPTION) {
                         try {
                             Files.write(Paths.get(path2String), exportString.toString().getBytes());
@@ -264,6 +316,9 @@ public class Controller {
                     }
                 }
             } catch (FileNotFoundException e) {
+                alertMSG = "click 'Znajdź plik' and find Carricamento massivo file";
+                alert.setHeaderText(alertMSG);
+                alert.show();
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -271,7 +326,21 @@ public class Controller {
                 e.printStackTrace();
             }
         }
+
     }
+
+    private Task createWorker() {
+        return new Task() {
+            @Override
+            protected Object call() throws Exception {
+                for (int i = 0; i < 10; i++) {
+                    updateProgress(i + 1, 10);
+                }
+                return true;
+            }
+        };
+    }
+
 
     @FXML
     private void openFile(File selectedFile) {
@@ -286,7 +355,6 @@ public class Controller {
 
     @FXML
     public void handleKeyPressed(KeyEvent keyEvent) {
-
         Set<Character> set = new HashSet<Character>();
 
         for (Node node : pane.getChildren()) {
