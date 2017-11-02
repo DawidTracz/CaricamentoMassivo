@@ -62,6 +62,15 @@ public class Controller {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         String alertMSG;
 
+        copyWorker = createWorker();
+        progressBar.progressProperty().unbind();
+        progressBar.progressProperty().bind(copyWorker.progressProperty());
+        copyWorker.messageProperty().addListener(new ChangeListener<String>() {
+            public void changed(ObservableValue<? extends String> observable,
+                                String oldValue, String newValue) {
+            }
+        });
+        new Thread(copyWorker).start();
 
 
         for (Node node : pane.getChildren()) {
