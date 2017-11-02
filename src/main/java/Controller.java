@@ -105,7 +105,7 @@ public class Controller {
         }
 
 
-        if (hasEmpty == true) {
+        if (hasEmpty) {
             DateFormat shortFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
             DateFormat mediumFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
             Date dateInizio = new Date();
@@ -120,7 +120,7 @@ public class Controller {
                 Boolean mainAllert = true;
                 int counter = 1;
 
-                while (iterator.hasNext() && mainAllert == true) {
+                while (iterator.hasNext() && mainAllert) {
                     Row currentRow = iterator.next();
                     counter+=1;
                     for (int i = 0; i < 14; i++) {
@@ -366,7 +366,7 @@ public class Controller {
 
     @FXML
     public void handleKeyPressed(KeyEvent keyEvent) {
-        Set<Character> set = new HashSet<Character>();
+        Set<Character> set = new HashSet<>();
 
         for (Node node : pane.getChildren()) {
             if (node instanceof TextField) {
