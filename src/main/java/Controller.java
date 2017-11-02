@@ -118,9 +118,11 @@ public class Controller {
                 Iterator<Row> iterator = datatypeSheet.iterator();
                 iterator.next();
                 Boolean mainAllert = true;
+                int counter = 1;
 
                 while (iterator.hasNext() && mainAllert == true) {
                     Row currentRow = iterator.next();
+                    counter+=1;
                     for (int i = 0; i < 14; i++) {
                         int colToCopy = inputString.charAt(i) - 97;
                         Cell cell;
@@ -131,7 +133,7 @@ public class Controller {
                                 //PROG_UDA
                                 cell = currentRow.getCell(colToCopy);
                                 if ((int) cell.getNumericCellValue() > 9999999 || (int) cell.getNumericCellValue() < 1000000 || cell.toString().length() > 9 || cell.toString().length() < 7) { //symbols as 1234567.0
-                                    alertMSG = "UDA cannot have more or less than 7 digits";
+                                    alertMSG = "UDA in line" + counter+ "has more than 7 digits";
                                     alert.setHeaderText(alertMSG);
                                     alert.show();
                                     mainAllert = false;
@@ -151,7 +153,7 @@ public class Controller {
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
                                     if (cell.toString().length() > 50) {
-                                        alertMSG = "Some Descrizione Filliale is to long";
+                                        alertMSG = "Descrizione Filliale in line "+ counter+" is to long";
                                         alert.setHeaderText(alertMSG);
                                         alert.show();
                                         mainAllert = false;
@@ -169,7 +171,7 @@ public class Controller {
                                 //TipoDoc
                                 cell = currentRow.getCell(colToCopy);
                                 if ((int) cell.getNumericCellValue() > 99999) {
-                                    alertMSG = "TipoDOC and Filiale can have maximum 5 numbers";
+                                    alertMSG = "TipoDOC and Filiale in line "+ counter+" has more than 5 numbers";
                                     alert.setHeaderText(alertMSG);
                                     alert.show();
                                     mainAllert = false;
@@ -189,7 +191,7 @@ public class Controller {
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
                                     if (cell.getStringCellValue().length() > 3) {
-                                        alertMSG = "DISLOCAZIONE can have maximum 3 numbers";
+                                        alertMSG = "DISLOCAZIONE in line" + counter+" has more than 3 numbers";
                                         alert.setHeaderText(alertMSG);
                                         alert.show();
                                         mainAllert = false;
@@ -212,7 +214,7 @@ public class Controller {
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
                                     if (cell.toString().length() > 80) {
-                                        alertMSG = "Some DescTipo or Note is too long";
+                                        alertMSG = "Some DescTipo or Note in line " + counter+ " is too long";
                                         alert.setHeaderText(alertMSG);
                                         alert.show();
                                         mainAllert = false;
@@ -227,7 +229,7 @@ public class Controller {
                                 //ANNI CONS
                                 cell = currentRow.getCell(colToCopy);
                                 if ((int) cell.getNumericCellValue() > 99) {
-                                    alertMSG = "ANNI CONSERVATIONI CAN BE MAX 2 NUMBERED";
+                                    alertMSG = "ANNI CONSERVATIONI in line " + counter+" has more than 2 numbers";
                                     alert.setHeaderText(alertMSG);
                                     alert.show();
                                     mainAllert = false;
@@ -255,7 +257,7 @@ public class Controller {
                                 String shortDateFine = shortFormat.format(mediumFormat.parse(cellWithDateFine));
 
                                 if (dateInizio.after(dateFine)) {
-                                    alertMSG = "Data Fine is before Data Inizio ";
+                                    alertMSG = "Data Fine in line " + counter+" is before Data Inizio ";
                                     alert.setHeaderText(alertMSG);
                                     alert.show();
                                     mainAllert = false;
@@ -289,7 +291,7 @@ public class Controller {
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
                                     if (cell.toString().length() > 64) {
-                                        alertMSG = "DENOMINAZIONE może mieć max 64 znaki";
+                                        alertMSG = "DENOMINAZIONE in line " + counter+ " has more than 64 symbols";
                                         alert.setHeaderText(alertMSG);
                                         alert.show();
                                         mainAllert = false;
@@ -392,5 +394,12 @@ public class Controller {
         }
     }
 
+    public void cleanButton(ActionEvent event) {
+        for (int i = 0; i < 14; i++) {
+            textField = (TextField) pane.lookup("#textField" + i);
+            textField.setText("");
+
+        }
+    }
 }
 

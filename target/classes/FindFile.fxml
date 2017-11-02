@@ -42,7 +42,12 @@
       <Label fx:id="Tipo_Doc" layoutX="29.0" layoutY="187.0" text="TIPO DOC" />
       <Label fx:id="DescTipo" layoutX="28.0" layoutY="230.0" text="DESC TIPO" />
       <Label fx:id="AnniCons" layoutX="29.0" layoutY="264.0" text="ANNI CONS" />
-      <ProgressBar fx:id="progressBar" layoutX="206.0" layoutY="330.0" prefWidth="200.0" progress="0.0" />
+      <ProgressBar fx:id="progressBar" layoutX="205.0" layoutY="308.0" prefWidth="200.0" progress="0.0" />
+      <Button layoutX="226.0" layoutY="498.0" mnemonicParsing="false" onAction="#cleanButton" prefHeight="56.0" prefWidth="157.0" text="WYCZYŚĆ POLA">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
    </children>
    <opaqueInsets>
       <Insets />
