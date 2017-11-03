@@ -286,8 +286,8 @@ public class Controller {
                 }
                 if (mainPass) {
                     alertMSG = "Everything is OK :D Now you will save a file :))";
-                    alertERROR.setHeaderText(alertMSG);
-                    alertERROR.show();
+                    alertInformation.setHeaderText(alertMSG);
+
                     JFileChooser chooser = new JFileChooser();
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     int option = chooser.showSaveDialog(null);
@@ -300,11 +300,12 @@ public class Controller {
                             e.printStackTrace();
                         }
                     }
+                    alertInformation.show();
                 }
                 else {
-                    alertMSG = "The process occurs some ERRORS. Now you will save CarricamentoMassivoERRORS";
-                    alertInformation.setHeaderText(alertMSG);
-                    alertInformation.show();
+                    alertMSG = "The process occurs some ERRORS. Check CarricamentoMassivoERRORS";
+                    alertERROR.setHeaderText(alertMSG);
+
                     JFileChooser chooser = new JFileChooser();
                     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                     int option = chooser.showSaveDialog(null);
@@ -317,6 +318,7 @@ public class Controller {
                             e.printStackTrace();
                         }
                     }
+                    alertERROR.show();
                 }
             } catch (FileNotFoundException e) {
                 alertMSG = "click on 'Znajdź plik' and find Carricamento massivo file";
