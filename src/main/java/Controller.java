@@ -31,17 +31,17 @@ public class Controller {
     private Window stage;
     @FXML
     private Pane pane;
-
     String excelFilePath = "";
     @FXML
     private TextField textField;
     @FXML
     private ProgressBar progressBar;
-
     int colToCopy;
     Cell cell;
     int stringProperLength;
     Task copyWorker;
+
+
 
     @FXML
     public void buttonPressed(ActionEvent event) {
@@ -67,6 +67,7 @@ public class Controller {
         Alert alertERROR = new Alert(Alert.AlertType.ERROR);
         Alert alertInformation = new Alert(Alert.AlertType.INFORMATION);
         String alertMSG;
+
 
         copyWorker = createWorker();
         progressBar.progressProperty().unbind();
@@ -109,25 +110,27 @@ public class Controller {
             alertERROR.show();
             hasEmpty = false;
         }
-
-
         if (hasEmpty) {
             DateFormat shortFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
             DateFormat mediumFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
             Date dateInizio = new Date();
             Date dateFine = new Date();
+
             try {
                 FileInputStream excelFile = new FileInputStream(new File(excelFilePath));
                 Workbook workbook = new XSSFWorkbook(excelFile);
                 Sheet datatypeSheet = workbook.getSheetAt(0);
                 Iterator<Row> iterator = datatypeSheet.iterator();
                 iterator.next();
+
+
                 Boolean mainPass = true;
+                Boolean errorPass = false;
                 int counter = 1;
 
                 while (iterator.hasNext()) {
                     Row currentRow = iterator.next();
-                    counter+=1;
+                    counter += 1;
                     for (int i = 0; i < 14; i++) {
                         colToCopy = inputString.charAt(i) - 97;
                         switch (i) {
@@ -135,8 +138,9 @@ public class Controller {
                                 //PROG_UDA
                                 cell = currentRow.getCell(colToCopy);
                                 if ((int) cell.getNumericCellValue() > 9999999 || (int) cell.getNumericCellValue() < 1000000 || cell.toString().length() > 9 || cell.toString().length() < 7) { //symbols as 1234567.0
-                                    errorString.append("UDA in line" + counter+ "has more than 7 digits**");
+                                    errorString.append("UDA in line" + counter + "has more than 7 digits**");
                                     mainPass = false;
+                                    errorPass = true;
                                     break;
                                 } else if (cell.toString().length() == 9) {
                                     exportString.append(String.valueOf((int) cell.getNumericCellValue()) + "*");
@@ -153,7 +157,8 @@ public class Controller {
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
                                     if (cell.toString().length() > 50) {
-                                        errorString.append("Descrizione Filliale in line "+ counter+" is to long**");
+                                        errorString.append("Descrizione Filliale in line " + counter + " is to long**");
+                                        errorPass = true;
                                         mainPass = false;
                                         break;
                                     } else {
@@ -168,7 +173,8 @@ public class Controller {
                                 //TipoDoc
                                 cell = currentRow.getCell(colToCopy);
                                 if ((int) cell.getNumericCellValue() > 99999) {
-                                    errorString.append("TipoDOC and Filiale in line "+ counter+" has more than 5 numbers**");
+                                    errorString.append("TipoDOC and Filiale in line " + counter + " has more than 5 numbers**");
+                                    errorPass = true;
                                     mainPass = false;
                                     break;
                                 } else {
@@ -184,7 +190,8 @@ public class Controller {
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
                                     if (cell.getStringCellValue().length() > 3) {
-                                        errorString.append("DISLOCAZIONE in line" + counter+" has more than 3 numbers**");
+                                        errorString.append("DISLOCAZIONE in line" + counter + " has more than 3 numbers**");
+                                        errorPass = true;
                                         mainPass = false;
                                         break;
                                     } else {
@@ -203,8 +210,9 @@ public class Controller {
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
                                     if (cell.toString().length() > 80) {
-                                        errorString.append("Some DescTipo or Note in line " + counter+ " is too long**");
+                                        errorString.append("Some DescTipo or Note in line " + counter + " is too long**");
                                         mainPass = false;
+                                        errorPass = true;
                                         break;
                                     } else {
                                         stringProperLength = 80 - cell.toString().length();
@@ -216,8 +224,9 @@ public class Controller {
                                 //ANNI CONS
                                 cell = currentRow.getCell(colToCopy);
                                 if ((int) cell.getNumericCellValue() > 99) {
-                                    errorString.append("ANNI CONSERVATIONI in line " + counter+" has more than 2 numbers**");
+                                    errorString.append("ANNI CONSERVATIONI in line " + counter + " has more than 2 numbers**");
                                     mainPass = false;
+                                    errorPass = true;
                                     break;
                                 } else {
                                     stringProperLength = 2 - String.valueOf((int) cell.getNumericCellValue()).length();
@@ -239,8 +248,9 @@ public class Controller {
                                 dateFine = mediumFormat.parse(cellWithDateFine);
                                 String shortDateFine = shortFormat.format(mediumFormat.parse(cellWithDateFine));
                                 if (dateInizio.after(dateFine)) {
-                                    errorString.append("Data Fine in line " + counter+" is before Data Inizio**");
+                                    errorString.append("Data Fine in line " + counter + " is before Data Inizio**");
                                     mainPass = false;
+                                    errorPass = true;
                                 } else {
                                     exportString.append(shortDateFine + "*");
                                 }
@@ -257,9 +267,9 @@ public class Controller {
                                     break;
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
-                                        stringProperLength = 16 - String.valueOf(((long) cell.getNumericCellValue())).length();
-                                        exportString.append(StringUtils.repeat("0", stringProperLength) + ((long) cell.getNumericCellValue()) + "*");
-                                        break;
+                                    stringProperLength = 16 - String.valueOf(((long) cell.getNumericCellValue())).length();
+                                    exportString.append(StringUtils.repeat("0", stringProperLength) + ((long) cell.getNumericCellValue()) + "*");
+                                    break;
                                 }
                             case 12:
                                 //Denominazione
@@ -269,8 +279,9 @@ public class Controller {
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
                                     if (cell.toString().length() > 64) {
-                                        errorString.append("DENOMINAZIONE in line " + counter+ " has more than 64 symbols**");
+                                        errorString.append("DENOMINAZIONE in line " + counter + " has more than 64 symbols**");
                                         mainPass = false;
+                                        errorPass = true;
                                         break;
                                     } else {
                                         stringProperLength = 64 - cell.toString().length();
@@ -281,11 +292,16 @@ public class Controller {
                         }
 
                     }
-                    errorString.append(System.lineSeparator());
+                    if (errorPass) {
+                        errorString.append(System.lineSeparator());
+                        errorPass = false;
+                    }
                     exportString.deleteCharAt(exportString.length() - 1).append(System.lineSeparator());
                 }
+
+
                 if (mainPass) {
-                    alertMSG = "Everything is OK :D Now you will save a file :))";
+                    alertMSG = "Everything is OK :D Now you can check a file :))";
                     alertInformation.setHeaderText(alertMSG);
 
                     JFileChooser chooser = new JFileChooser();
@@ -301,8 +317,7 @@ public class Controller {
                         }
                     }
                     alertInformation.show();
-                }
-                else {
+                } else {
                     alertMSG = "The process occurs some ERRORS. Check CarricamentoMassivoERRORS";
                     alertERROR.setHeaderText(alertMSG);
 
@@ -394,5 +409,7 @@ public class Controller {
             textField.setText("");
         }
     }
+    CarricamentoService carricamentoService;
+    carrcame
 }
 
