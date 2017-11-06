@@ -244,16 +244,32 @@ public class Controller {
                             case 6:
                                 //ANNI CONS
                                 cell = currentRow.getCell(colToCopy);
-                                if ((int) cell.getNumericCellValue() > 99) {
-                                    errorString.append("ANNI CONSERVATIONI in line " + counter + " has more than 2 numbers**");
-                                    mainPass = false;
-                                    errorPass = true;
-                                    break;
-                                } else {
-                                    stringProperLength = 2 - String.valueOf((int) cell.getNumericCellValue()).length();
-                                    exportString.append(StringUtils.repeat("0", stringProperLength) + String.valueOf((int) cell.getNumericCellValue()) + "*");
-                                    break;
+
+                                if (cell.getCellTypeEnum() == CellType.NUMERIC) {
+                                    if (cell.getNumericCellValue() > 99) {
+                                        errorString.append("ANNI CONSERVATIONI in line " + counter + " has more than 2 numbers**");
+                                        mainPass = false;
+                                        errorPass = true;
+                                        break;
+                                    } else {
+                                        stringProperLength = 2 - String.valueOf((int) cell.getNumericCellValue()).length();
+                                        exportString.append(StringUtils.repeat("0", stringProperLength) + ((int) cell.getNumericCellValue()) + "*");
+                                        break;
+                                    }
+                                } else if (cell.getCellTypeEnum() == CellType.STRING) {
+                                    if (cell.getStringCellValue().length() > 2) {
+                                        errorString.append("ANNI CONSERVATIONI in line " + counter + " has more than 2 numbers**");
+                                        mainPass = false;
+                                        errorPass = true;
+                                        break;
+                                    } else {
+                                        stringProperLength = 2 - String.valueOf((int) cell.getNumericCellValue()).length();
+                                        exportString.append(StringUtils.repeat("0", stringProperLength) + cell.getStringCellValue() + "*");
+                                        break;
+                                    }
+
                                 }
+
                             case 7:
                                 //Data INIZIO
                                 cell = currentRow.getCell(colToCopy);
