@@ -27,7 +27,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Controller {  
+public class Controller {    
     private Window stage;
     @FXML
     private Pane pane;
