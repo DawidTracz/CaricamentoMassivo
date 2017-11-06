@@ -16,7 +16,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -40,7 +40,6 @@ public class Controller {
     Cell cell;
     int stringProperLength;
     Task copyWorker;
-
 
 
     @FXML
@@ -111,7 +110,7 @@ public class Controller {
             hasEmpty = false;
         }
         if (hasEmpty) {
-            DateFormat shortFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
+            DateFormat shortFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
             DateFormat mediumFormat = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
             Date dateInizio = new Date();
             Date dateFine = new Date();
@@ -137,17 +136,26 @@ public class Controller {
                             case 0:
                                 //PROG_UDA
                                 cell = currentRow.getCell(colToCopy);
-                                if ((int) cell.getNumericCellValue() > 9999999 || (int) cell.getNumericCellValue() < 1000000 || cell.toString().length() > 9 || cell.toString().length() < 7) { //symbols as 1234567.0
-                                    errorString.append("UDA in line" + counter + "has more than 7 digits**");
-                                    mainPass = false;
-                                    errorPass = true;
-                                    break;
-                                } else if (cell.toString().length() == 9) {
-                                    exportString.append(String.valueOf((int) cell.getNumericCellValue()) + "*");
-                                    break;
-                                } else if (cell.toString().length() == 7) {
-                                    exportString.append(cell.toString() + "*");
-                                    break;
+
+                                if (cell.getCellTypeEnum() == CellType.NUMERIC) {
+                                    if ((int) cell.getNumericCellValue() > 9999999 || (int) cell.getNumericCellValue() < 1000000) { //symbols as 1234567.0
+                                        errorString.append("UDA in line" + counter + "has more than 7 digits**");
+                                        mainPass = false;
+                                        errorPass = true;
+                                        break;
+                                    } else {
+                                        exportString.append(String.valueOf((int) cell.getNumericCellValue()) + "*");
+                                    }
+                                } else if (cell.getCellTypeEnum() == CellType.STRING) {
+                                    if (cell.getStringCellValue().length() != 7) {
+                                        errorString.append("UDA in line" + counter + "does not have 7 digits**");
+                                        mainPass = false;
+                                        errorPass = true;
+                                        break;
+                                    } else if (cell.getStringCellValue().length() == 7) {
+                                        exportString.append(cell.getStringCellValue() + "*");
+                                        break;
+                                    }
                                 }
                             case 1:
                                 //DESCRIZIONE FILLIALE
@@ -172,15 +180,28 @@ public class Controller {
                                 //Filiale
                                 //TipoDoc
                                 cell = currentRow.getCell(colToCopy);
-                                if ((int) cell.getNumericCellValue() > 99999) {
-                                    errorString.append("TipoDOC and Filiale in line " + counter + " has more than 5 numbers**");
-                                    errorPass = true;
-                                    mainPass = false;
-                                    break;
-                                } else {
-                                    stringProperLength = 5 - String.valueOf((int) cell.getNumericCellValue()).length();
-                                    exportString.append(StringUtils.repeat("0", stringProperLength) + String.valueOf((int) cell.getNumericCellValue()) + "*");
-                                    break;
+                                if (cell.getCellTypeEnum() == CellType.NUMERIC) {
+                                    if ((int) cell.getNumericCellValue() > 99999) {
+                                        errorString.append("TipoDOC and Filiale in line " + counter + " has more than 5 numbers**");
+                                        errorPass = true;
+                                        mainPass = false;
+                                        break;
+                                    } else {
+                                        stringProperLength = 5 - String.valueOf((int) cell.getNumericCellValue()).length();
+                                        exportString.append(StringUtils.repeat("0", stringProperLength) + String.valueOf((int) cell.getNumericCellValue()) + "*");
+                                        break;
+                                    }
+                                } else if (cell.getCellTypeEnum() == CellType.STRING) {
+                                    if (cell.getStringCellValue().length() > 5) {
+                                        errorString.append("TipoDOC and Filiale in line " + counter + " has more than 5 numbers**");
+                                        errorPass = true;
+                                        mainPass = false;
+                                        break;
+                                    } else {
+                                        stringProperLength = 5 - cell.getStringCellValue().length();
+                                        exportString.append(StringUtils.repeat("0", stringProperLength) + cell.getStringCellValue() + "*");
+                                        break;
+                                    }
                                 }
                             case 3:
                                 //Dislocazione
@@ -409,7 +430,7 @@ public class Controller {
             textField.setText("");
         }
     }
-    CarricamentoService carricamentoService;
-    carrcame
+
+
 }
 
