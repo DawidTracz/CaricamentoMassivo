@@ -210,6 +210,11 @@ public class Controller {
                                     break;
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
+
+
+
+
+
                                     if (cell.getStringCellValue().length() > 3) {
                                         errorString.append("DISLOCAZIONE in line" + counter + " has more than 3 numbers**");
                                         errorPass = true;
