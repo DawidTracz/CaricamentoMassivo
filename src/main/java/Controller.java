@@ -9,14 +9,12 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,10 +22,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public class Controller {    
+
+public class Controller {
     private Window stage;
     @FXML
     private Pane pane;
@@ -42,19 +39,11 @@ public class Controller {
     Task copyWorker;
 
 
+    CarricamentoService carricamentoService= new CarricamentoService();
+
     @FXML
     public void buttonPressed(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Znajdź plik");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All FILES", "*.*"),
-                new FileChooser.ExtensionFilter("XLS", "*.xls"),
-                new FileChooser.ExtensionFilter("XLSX", "*.xlsx"));
-        File selectedFile = fileChooser.showOpenDialog(stage);
-        if (selectedFile != null) {
-            openFile(selectedFile);
-            excelFilePath = selectedFile.getPath();
-        }
+      carricamentoService.buttonPressed(null);
     }
 
     @FXML
@@ -76,6 +65,8 @@ public class Controller {
                                 String oldValue, String newValue) {
             }
         });
+
+
         new Thread(copyWorker).start();
 
 
@@ -210,11 +201,6 @@ public class Controller {
                                     break;
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
-
-
-
-
-
                                     if (cell.getStringCellValue().length() > 3) {
                                         errorString.append("DISLOCAZIONE in line" + counter + " has more than 3 numbers**");
                                         errorPass = true;
@@ -385,6 +371,10 @@ public class Controller {
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ParseException e) {
+                alertMSG = "something went wrong with date - parsing. Check datas in excel file";
+                alertERROR.setHeaderText(alertMSG);
+                alertERROR.show();
+                e.printStackTrace();
                 e.printStackTrace();
             }
         }
@@ -403,17 +393,6 @@ public class Controller {
         };
     }
 
-
-    @FXML
-    private void openFile(File selectedFile) {
-        try {
-            Desktop.getDesktop().open(selectedFile);
-        } catch (IOException ex) {
-            Logger.getLogger(FileChooser.class.getName()).log(
-                    Level.SEVERE, null, ex
-            );
-        }
-    }
 
     @FXML
     public void handleKeyPressed(KeyEvent keyEvent) {
