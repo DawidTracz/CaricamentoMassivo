@@ -18,9 +18,9 @@
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.stage.FileChooser;
-import javafx.stage.Window;
+//import javafx.stage.Window;
 
-import java.awt.*;
+//import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -41,10 +41,10 @@ import java.util.logging.Logger;
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 //
-public class CarricamentoService {
+//public class CarricamentoService {
 
- String excelFilePath = "";
-    Window stage;
+ //String excelFilePath = "";
+   // Window stage;
 //    int colToCopy;
 //    Cell cell;
 //    int stringProperLength;
@@ -434,21 +434,21 @@ public class CarricamentoService {
 //
 //    }
 //
-    @FXML
-    public void buttonPressed(ActionEvent event) {
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Znajdź plik");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All FILES", "*.*"),
-                new FileChooser.ExtensionFilter("XLS", "*.xls"),
-                new FileChooser.ExtensionFilter("XLSX", "*.xlsx"));
-        File selectedFile = fileChooser.showOpenDialog(stage);
-        if (selectedFile != null) {
-            openFile(selectedFile);
-            excelFilePath = selectedFile.getPath();
-        }
-    }
+//    @FXML
+//    public void buttonPressed(ActionEvent event) {
+//
+//        FileChooser fileChooser = new FileChooser();
+//        fileChooser.setTitle("Znajdź plik");
+//        fileChooser.getExtensionFilters().addAll(
+//                new FileChooser.ExtensionFilter("All FILES", "*.*"),
+//                new FileChooser.ExtensionFilter("XLS", "*.xls"),
+//                new FileChooser.ExtensionFilter("XLSX", "*.xlsx"));
+//        File selectedFile = fileChooser.showOpenDialog(stage);
+//        if (selectedFile != null) {
+//            openFile(selectedFile);
+//            excelFilePath = selectedFile.getPath();
+//        }
+//    }
 //
 //    private Task createWorker() {
 //        return new Task() {
@@ -462,14 +462,14 @@ public class CarricamentoService {
 //        };
 //    }
 //
-    @FXML
-    private void openFile(File selectedFile) {
-        try {
-            Desktop.getDesktop().open(selectedFile);
-        } catch (IOException ex) {
-            Logger.getLogger(FileChooser.class.getName()).log(
-                    Level.SEVERE, null, ex
-            );
-        }
-    }
-}
+//    @FXML
+//    private void openFile(File selectedFile) {
+//        try {
+//            Desktop.getDesktop().open(selectedFile);
+//        } catch (IOException ex) {
+//            Logger.getLogger(FileChooser.class.getName()).log(
+//                    Level.SEVERE, null, ex
+//            );
+//        }
+//    }
+//}

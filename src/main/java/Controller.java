@@ -9,12 +9,14 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -22,6 +24,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class Controller {
@@ -37,13 +41,24 @@ public class Controller {
     Cell cell;
     int stringProperLength;
     Task copyWorker;
-
-
-    CarricamentoService carricamentoService= new CarricamentoService();
+    Logger logger;
 
     @FXML
     public void buttonPressed(ActionEvent event) {
-      carricamentoService.buttonPressed(null);
+
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Znajdź plik");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("All FILES", "*.*"),
+                new FileChooser.ExtensionFilter("XLS", "*.xls"),
+                new FileChooser.ExtensionFilter("XLSX", "*.xlsx"));
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        if (selectedFile != null) {
+            openFile(selectedFile);
+            excelFilePath = selectedFile.getPath();
+        }
+
     }
 
     @FXML
@@ -136,6 +151,7 @@ public class Controller {
                                         break;
                                     } else {
                                         exportString.append(String.valueOf((int) cell.getNumericCellValue()) + "*");
+                                        break;
                                     }
                                 } else if (cell.getCellTypeEnum() == CellType.STRING) {
                                     if (cell.getStringCellValue().length() != 7) {
@@ -150,11 +166,14 @@ public class Controller {
                                 }
                             case 1:
                                 //DESCRIZIONE FILLIALE
+
+                                cell = currentRow.getCell(colToCopy);
                                 if (inputString.charAt(i) == '0') {
-                                    exportString.append(StringUtils.repeat(" ", 3) + "50");
+                                    exportString.append(StringUtils.repeat(" ", 50));
+
                                     break;
                                 } else {
-                                    cell = currentRow.getCell(colToCopy);
+
                                     if (cell.toString().length() > 50) {
                                         errorString.append("Descrizione Filliale in line " + counter + " is to long**");
                                         errorPass = true;
@@ -163,9 +182,12 @@ public class Controller {
                                     } else {
                                         stringProperLength = 50 - cell.toString().length();
                                         exportString.append(cell.toString() + StringUtils.repeat(" ", stringProperLength) + "*");
+
                                         break;
                                     }
                                 }
+
+
                             case 2:
                             case 4:
                                 //Filiale
@@ -296,7 +318,7 @@ public class Controller {
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
                                     stringProperLength = 16 - String.valueOf(((long) cell.getNumericCellValue())).length();
-                                    exportString.append(StringUtils.repeat("0", stringProperLength) + ((long) cell.getNumericCellValue()) + "*");
+                                    exportString.append(StringUtils.repeat("0", stringProperLength) + String.valueOf(((long) cell.getNumericCellValue())) + "*");
                                     break;
                                 }
                             case 12:
@@ -325,6 +347,7 @@ public class Controller {
                         errorPass = false;
                     }
                     exportString.deleteCharAt(exportString.length() - 1).append(System.lineSeparator());
+
                 }
 
 
@@ -393,7 +416,6 @@ public class Controller {
         };
     }
 
-
     @FXML
     public void handleKeyPressed(KeyEvent keyEvent) {
         Set<Character> set = new HashSet<>();
@@ -431,6 +453,16 @@ public class Controller {
         }
     }
 
+    @FXML
+    private void openFile(File selectedFile) {
+        try {
+            Desktop.getDesktop().open(selectedFile);
+        } catch (IOException ex) {
+            Logger.getLogger(FileChooser.class.getName()).log(
+                    Level.SEVERE, null, ex
+            );
+        }
+    }
 
 }
 
