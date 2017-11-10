@@ -43,8 +43,8 @@ import java.util.logging.Logger;
 //
 //public class CarricamentoService {
 
- //String excelFilePath = "";
-   // Window stage;
+//    String excelFilePath = "";
+//    Window stage;
 //    int colToCopy;
 //    Cell cell;
 //    int stringProperLength;
@@ -462,7 +462,7 @@ import java.util.logging.Logger;
 //        };
 //    }
 //
-//    @FXML
+//  @FXML
 //    private void openFile(File selectedFile) {
 //        try {
 //            Desktop.getDesktop().open(selectedFile);

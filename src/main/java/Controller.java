@@ -70,8 +70,6 @@ public class Controller {
         Alert alertERROR = new Alert(Alert.AlertType.ERROR);
         Alert alertInformation = new Alert(Alert.AlertType.INFORMATION);
         String alertMSG;
-
-
         copyWorker = createWorker();
         progressBar.progressProperty().unbind();
         progressBar.progressProperty().bind(copyWorker.progressProperty());
@@ -186,7 +184,6 @@ public class Controller {
                                         break;
                                     }
                                 }
-
 
                             case 2:
                             case 4:
