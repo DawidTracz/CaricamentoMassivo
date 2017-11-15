@@ -13,7 +13,6 @@ import javafx.stage.FileChooser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -52,14 +51,20 @@ public class Controller {
 
     private String mediumFormatString = "dd-MMM-yyyy";
 
-    private int textFieldInputProperLength;
+    private static int textFieldInputProperLength;
 
     String cellText = StringUtils.EMPTY;
 
+    int numberOfTextFields = 14;
+
+    CarricamentoService carricamentoService = new CarricamentoService();
+
     @FXML
     public void buttonPressed(ActionEvent event) {
+
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Znajdź plik");
+
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("All FILES", "*.*"),
                 new FileChooser.ExtensionFilter("XLS", "*.xls"),
@@ -90,9 +95,7 @@ public class Controller {
             }
         });
 
-
         new Thread(copyWorker).start();
-
 
         for (Node node : pane.getChildren()) {
             if (node instanceof TextField && ((TextField) node).getText().length() == 0) {
@@ -106,11 +109,10 @@ public class Controller {
             }
         }
 
-        for (int i = 0; i < 14; i++) {
+        for (int i = 0; i < numberOfTextFields; i++) {
             textField = (TextField) pane.lookup("#textField" + i);
             inputString.append(textField.getText().toLowerCase());
         }
-
 
         if (inputString.charAt(0) == '0' ||
                 inputString.charAt(2) == '0' ||
@@ -118,12 +120,14 @@ public class Controller {
                 inputString.charAt(6) == '0' ||
                 inputString.charAt(7) == '0' ||
                 inputString.charAt(8) == '0') {
-            String unField = "Textfields with PROGR_UDA \n FILIALE \n TIPO_DOC \n ANNI_CONS \n DATA INIZIO \n DATA FINE        cannot posses value '0', change it";
+            String unField = "Textfields with PROGR_UDA \n FILIALE \n TIPO_DOC \n ANNI_CONS \n DATA INIZIO \n DATA FINE        cannot posses value '0', change it!!!";
             alertERROR = new Alert(Alert.AlertType.ERROR);
             alertERROR.setHeaderText(unField);
             alertERROR.show();
             hasEmpty = false;
         }
+
+
         if (hasEmpty) {
 
             DateFormat shortFormat = new SimpleDateFormat(shortFormatString, Locale.ENGLISH);
@@ -138,29 +142,22 @@ public class Controller {
                 Iterator<Row> iterator = datatypeSheet.iterator();
                 iterator.next();
 
-
                 Boolean mainPass = true;
                 Boolean errorPass = false;
+
                 int counter = 1;
 
                 while (iterator.hasNext()) {
                     Row currentRow = iterator.next();
                     counter += 1;
-                    for (int i = 0; i < 14; i++) {
-                        colToCopy = inputString.charAt(i) - 97;  // zamien 97 na chara
+                    for (int i = 0; i < numberOfTextFields; i++) {
+                        colToCopy = inputString.charAt(i) - 'a';
                         switch (i) {
                             case 0:
                                 //PROG_UDA
-                                cell = currentRow.getCell(colToCopy);
-
-
-                                if (cell.getCellTypeEnum() == CellType.NUMERIC) {
-                                    cellText = String.valueOf((int) cell.getNumericCellValue());
-                                }
-                                if (cell.getCellTypeEnum() == CellType.STRING) {
-                                    cellText = cell.getStringCellValue();
-                                }
-                                if (cellText.length() != 7) {
+                                textFieldInputProperLength = 7;
+                                cellText= carricamentoService.cellTextSet(cell,currentRow,colToCopy);
+                                if (cellText.length() != textFieldInputProperLength) {
                                     errorString.append("UDA in line" + counter + "does not have 7 digits**");
                                     mainPass = false;
                                     errorPass = true;
@@ -168,17 +165,15 @@ public class Controller {
                                     exportString.append(cellText).append("*");
                                 }
                                 break;
-
-
                             case 1:
                                 //DESCRIZIONE FILLIALE
 
                                 cell = currentRow.getCell(colToCopy);
                                 textFieldInputProperLength = 50;
+
                                 if (inputString.charAt(i) == '0') {
                                     exportString.append(StringUtils.repeat(" ", textFieldInputProperLength));
                                 } else {
-
                                     if (cell.toString().length() > textFieldInputProperLength) {
                                         errorString.append("Descrizione Filliale in line " + counter + " is to long**");
                                         errorPass = true;
@@ -193,14 +188,10 @@ public class Controller {
                             case 4:
                                 //Filiale
                                 //TipoDoc
-                                cell = currentRow.getCell(colToCopy);
+
                                 textFieldInputProperLength = 5;
-                                if (cell.getCellTypeEnum() == CellType.NUMERIC) {
-                                    cellText = String.valueOf((int) cell.getNumericCellValue());
-                                }
-                                if (cell.getCellTypeEnum() == CellType.STRING) {
-                                    cellText = cell.getStringCellValue();
-                                }
+                                cellText= carricamentoService.cellTextSet(cell,currentRow,colToCopy);
+
                                 if (cellText.length() > textFieldInputProperLength) {
                                     System.out.println(cellText);
                                     errorString.append("TipoDOC and Filiale in line " + counter + " has more than 5 numbers**");
@@ -235,33 +226,26 @@ public class Controller {
                             case 9:
                                 //DESC TIPO
                                 //NOTE
-                                stringProperLength = 80;
+                                textFieldInputProperLength = 80;
                                 if (inputString.charAt(i) == '0') {
                                     exportString.append(StringUtils.repeat(" ", stringProperLength)).append("*");
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
-                                    if (cell.toString().length() > stringProperLength) {
+                                    if (cell.toString().length() > textFieldInputProperLength) {
                                         errorString.append("Some DescTipo or Note in line " + counter + " is too long**");
                                         mainPass = false;
                                         errorPass = true;
                                     } else {
-                                        stringProperLength = stringProperLength - cell.toString().length();
+                                        stringProperLength = textFieldInputProperLength - cell.toString().length();
                                         exportString.append(cell.toString()).append(StringUtils.repeat(" ", stringProperLength)).append("*");
                                     }
                                 }
                                 break;
                             case 6:
                                 //ANNI CONS
-                                cell = currentRow.getCell(colToCopy);
+
                                 textFieldInputProperLength = 2;
-
-
-                                if (cell.getCellTypeEnum() == CellType.NUMERIC) {
-                                    cellText = String.valueOf((int) cell.getNumericCellValue());
-                                }
-                                if (cell.getCellTypeEnum() == CellType.STRING) {
-                                    cellText = cell.getStringCellValue();
-                                }
+                                cellText= carricamentoService.cellTextSet(cell,currentRow,colToCopy);
                                 if (cellText.length() > textFieldInputProperLength) {
                                     errorString.append("ANNI CONSERVATIONI in line " + counter + " has more than 2 numbers**");
                                     mainPass = false;
@@ -317,27 +301,24 @@ public class Controller {
                                     exportString.append(StringUtils.repeat(" ", textFieldInputProperLength)).append("*");
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
-                                    cellText=cell.toString();
+                                    cellText = cell.toString();
                                     if (cell.toString().length() > textFieldInputProperLength) {
                                         errorString.append("DENOMINAZIONE in line " + counter + " has more than 64 symbols**");
                                         mainPass = false;
                                         errorPass = true;
-
                                     } else {
                                         stringProperLength = textFieldInputProperLength - cellText.length();
                                         exportString.append(cellText).append(StringUtils.repeat(" ", stringProperLength)).append("*");
                                     }
                                 }
-                                break;
+                            break;
                         }
-
                     }
                     if (errorPass) {
                         errorString.append(System.lineSeparator());
                         errorPass = false;
                     }
                     exportString.deleteCharAt(exportString.length() - 1).append(System.lineSeparator());
-
                 }
 
                 if (mainPass) {
@@ -377,16 +358,13 @@ public class Controller {
                 }
             } catch (FileNotFoundException e) {
                 alertMSG = "click on 'Znajdź plik' and find Carricamento massivo file";
-                alertERROR.setHeaderText(alertMSG);
-                alertERROR.show();
+                carricamentoService.errorSet(alertMSG, alertERROR);
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ParseException e) {
                 alertMSG = "something went wrong with date - parsing. Check datas in excel file";
-                alertERROR.setHeaderText(alertMSG);
-                alertERROR.show();
-                e.printStackTrace();
+                carricamentoService.errorSet(alertMSG, alertERROR);
                 e.printStackTrace();
             }
         }
@@ -411,21 +389,19 @@ public class Controller {
 
         for (Node node : pane.getChildren()) {
             if (node instanceof TextField) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
                 if ((((TextField) node).getText().length() > 1 ||
                         ((TextField) node).getText().length() == 1 &&
                                 !(((TextField) node).getText().toLowerCase().matches("[a-n]|[0]")))) {
                     String unField = "You can put only letters from a to n or 0!!!!! A to N are OK as well:)";
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setHeaderText(unField);
-                    alert.show();
+                    carricamentoService.errorSet(unField, alert);
                     ((TextField) node).setText(StringUtils.EMPTY);
                     break;
                 } else if (((TextField) node).getText().length() == 1) {
                     if (set.contains(((TextField) node).getText().charAt(0)) && !(((TextField) node).getText().matches("[0]"))) {
                         String duplicate = "You duplicated the value";
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setHeaderText(duplicate);
-                        alert.show();
+
+                        carricamentoService.errorSet(duplicate, alert);
                         ((TextField) node).setText(StringUtils.EMPTY);
                     } else {
                         set.add(((TextField) node).getText().charAt(0));
@@ -436,7 +412,7 @@ public class Controller {
     }
 
     public void cleanButton(ActionEvent event) {
-        for (int i = 0; i < 14; i++) {
+        for (int i = 0; i < numberOfTextFields; i++) {
             textField = (TextField) pane.lookup("#textField" + i);
             textField.setText(StringUtils.EMPTY);
         }

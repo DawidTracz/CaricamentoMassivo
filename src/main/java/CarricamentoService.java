@@ -17,7 +17,11 @@
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.stage.FileChooser;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 //import javafx.stage.Window;
 
 //import java.awt.*;
@@ -41,7 +45,31 @@ import java.util.logging.Logger;
 //import java.util.logging.Level;
 //import java.util.logging.Logger;
 //
-//public class CarricamentoService {
+public class CarricamentoService {
+
+    public void errorSet(String alertMSG, Alert alertERROR) {
+        alertERROR.setHeaderText(alertMSG);
+        alertERROR.show();
+    }
+
+    public String cellTextSet(Cell cell, Row currentRow, int colToCopy) {
+
+        cell = currentRow.getCell(colToCopy);
+        cell.setCellType(CellType.STRING);
+
+        return String.valueOf(cell);
+    }
+}
+
+
+
+
+
+
+
+
+
+
 
 //    String excelFilePath = "";
 //    Window stage;
