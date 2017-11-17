@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="4" failures="0" name="ArraysStreamLambdaTest" time="0.066" errors="0" skipped="0">
+<testsuite tests="4" failures="0" name="ArraysStreamLambdaTest" time="0.082" errors="0" skipped="0">
   <properties>
     <property name="idea.version" value="2017.2.1"/>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
@@ -64,8 +64,8 @@
     <property name="sun.desktop" value="windows"/>
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
-  <testcase classname="ArraysStreamLambdaTest" name="testCollectorWithPredicate" time="0.066"/>
+  <testcase classname="ArraysStreamLambdaTest" name="testCollectorWithPredicate" time="0.072"/>
   <testcase classname="ArraysStreamLambdaTest" name="testCollector" time="0"/>
   <testcase classname="ArraysStreamLambdaTest" name="testBasicArraysSteam" time="0"/>
-  <testcase classname="ArraysStreamLambdaTest" name="testBasicFunction" time="0"/>
+  <testcase classname="ArraysStreamLambdaTest" name="testBasicFunction" time="0.01"/>
 </testsuite>

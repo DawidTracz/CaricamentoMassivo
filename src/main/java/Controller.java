@@ -160,7 +160,7 @@ public class Controller {
                                 textFieldInputProperLength = 7;
                                 cellText = carricamentoService.cellTextSet(cell, currentRow, colToCopy);
                                 if (cellText.length() != textFieldInputProperLength) {
-                                    errorString.append("UDA in line" + counter + "does not have 7 digits**");
+                                    errorString.append("UDA in line").append(counter).append("does not have 7 digits**");
                                     mainPass = false;
                                     errorPass = true;
                                 } else {
@@ -177,7 +177,7 @@ public class Controller {
                                     exportString.append(StringUtils.repeat(" ", textFieldInputProperLength));
                                 } else {
                                     if (cell.toString().length() > textFieldInputProperLength) {
-                                        errorString.append("Descrizione Filliale in line " + counter + " is to long**");
+                                        errorString.append("Descrizione Filliale in line ").append(counter).append(" is to long**");
                                         errorPass = true;
                                         mainPass = false;
                                     } else {
@@ -196,7 +196,7 @@ public class Controller {
 
                                 if (cellText.length() > textFieldInputProperLength) {
 
-                                    errorString.append("TipoDOC and Filiale in line " + counter + " has more than 5 numbers**");
+                                    errorString.append("TipoDOC and Filiale in line ").append(counter).append(" has more than 5 numbers**");
                                     errorPass = true;
                                     mainPass = false;
 
@@ -213,7 +213,7 @@ public class Controller {
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
                                     if (cell.getStringCellValue().length() > textFieldInputProperLength) {
-                                        errorString.append("DISLOCAZIONE in line" + counter + " has more than 3 numbers**");
+                                        errorString.append("DISLOCAZIONE in line").append(counter).append(" has more than 3 numbers**");
                                         errorPass = true;
                                         mainPass = false;
                                     } else {
@@ -232,7 +232,7 @@ public class Controller {
                                 } else {
                                     cell = currentRow.getCell(colToCopy);
                                     if (cell.toString().length() > textFieldInputProperLength) {
-                                        errorString.append("Some DescTipo or Note in line " + counter + " is too long**");
+                                        errorString.append("Some DescTipo or Note in line ").append(counter).append(" is too long**");
                                         mainPass = false;
                                         errorPass = true;
                                     } else {
@@ -246,7 +246,7 @@ public class Controller {
                                 textFieldInputProperLength = 2;
                                 cellText = carricamentoService.cellTextSet(cell, currentRow, colToCopy);
                                 if (cellText.length() > textFieldInputProperLength) {
-                                    errorString.append("ANNI CONSERVATIONI in line " + counter + " has more than 2 numbers**");
+                                    errorString.append("ANNI CONSERVATIONI in line ").append(counter).append(" has more than 2 numbers**");
                                     mainPass = false;
                                     errorPass = true;
                                 } else {
@@ -269,7 +269,7 @@ public class Controller {
                                 dateFine = mediumFormat.parse(cellWithDateFine);
                                 String shortDateFine = shortFormat.format(mediumFormat.parse(cellWithDateFine));
                                 if (dateInizio.after(dateFine)) {
-                                    errorString.append("Data Fine in line " + counter + " is before Data Inizio**");
+                                    errorString.append("Data Fine in line ").append(counter).append(" is before Data Inizio**");
                                     mainPass = false;
                                     errorPass = true;
                                 } else {
@@ -304,7 +304,7 @@ public class Controller {
                                     cell = currentRow.getCell(colToCopy);
                                     cellText = cell.toString();
                                     if (cell.toString().length() > textFieldInputProperLength) {
-                                        errorString.append("DENOMINAZIONE in line " + counter + " has more than 64 symbols**");
+                                        errorString.append("DENOMINAZIONE in line ").append(counter).append(" has more than 64 symbols**");
                                         mainPass = false;
                                         errorPass = true;
                                     } else {
@@ -323,39 +323,9 @@ public class Controller {
                 }
 
                 if (mainPass) {
-                    alertMSG = "Everything is OK :D Now you can check a file :))";
-                    alertInformation.setHeaderText(alertMSG);
-
-                    JFileChooser chooser = new JFileChooser();
-                    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    int option = chooser.showSaveDialog(null);
-                    File pathToSave = new File(chooser.getSelectedFile().getPath());
-                    String pathToSaveString = pathToSave.toString() + "\\C0.CRV.SAD.SAD1CAC0.FILEUDAI.txt";
-                    if (option == JFileChooser.APPROVE_OPTION) {
-                        try {
-                            Files.write(Paths.get(pathToSaveString), exportString.toString().getBytes());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    alertInformation.show();
+                    alertText(alertInformation, "Everything is OK :D Now you can check a file :))", exportString, "\\C0.CRV.SAD.SAD1CAC0.FILEUDAI.txt");
                 } else {
-                    alertMSG = "The process occurs some ERRORS. Check CarricamentoMassivoERRORS";
-                    alertERROR.setHeaderText(alertMSG);
-
-                    JFileChooser chooser = new JFileChooser();
-                    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    int option = chooser.showSaveDialog(null);
-                    File pathToSave = new File(chooser.getSelectedFile().getPath());
-                    String pathToSaveString = pathToSave.toString() + "\\CarricamentoMassivoERRORS.txt";
-                    if (option == JFileChooser.APPROVE_OPTION) {
-                        try {
-                            Files.write(Paths.get(pathToSaveString), errorString.toString().getBytes());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    alertERROR.show();
+                    alertText(alertERROR, "The process occurs some ERRORS. Check CarricamentoMassivoERRORS", errorString, "\\CarricamentoMassivoERRORS.txt");
                 }
             } catch (FileNotFoundException e) {
                 alertMSG = "click on 'Znajdź plik' and find Carricamento massivo file";
@@ -370,6 +340,23 @@ public class Controller {
             }
         }
 
+    }
+    private void alertText(Alert alert, String alertTitle, StringBuilder errorString, String outputFileName) {
+        alert.setHeaderText(alertTitle);
+
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int option = chooser.showSaveDialog(null);
+        File pathToSave = new File(chooser.getSelectedFile().getPath());
+        String pathToSaveString = pathToSave.toString() + outputFileName;
+        if (option == JFileChooser.APPROVE_OPTION) {
+            try {
+                Files.write(Paths.get(pathToSaveString), errorString.toString().getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        alert.show();
     }
 
     private Task createWorker() {
@@ -387,6 +374,7 @@ public class Controller {
     @FXML
     public void handleKeyPressed(KeyEvent keyEvent) {
         Set<Character> set = new HashSet<>();
+        System.out.println(keyEvent.getSource());
         carricamentoService.handleKeyPressedMethod(pane, set, carricamentoService);
     }
 
@@ -397,6 +385,7 @@ public class Controller {
     @FXML
     private void openFile(File selectedFile) {
         try {
+
             Desktop.getDesktop().open(selectedFile);
         } catch (IOException ex) {
             Logger.getLogger(FileChooser.class.getName()).log(

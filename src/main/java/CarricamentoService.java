@@ -35,7 +35,7 @@ public class CarricamentoService {
         }
     }
 
-    public void handleKeyPressedMethod (Pane pane, Set set, CarricamentoService carricamentoService){
+    public void handleKeyPressedMethod (Pane pane, Set<Character> set, CarricamentoService carricamentoService){
 
         for (Node node : pane.getChildren()) {
             if (node instanceof TextField) {
