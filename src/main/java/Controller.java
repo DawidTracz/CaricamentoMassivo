@@ -13,6 +13,7 @@ import javafx.stage.FileChooser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -24,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 public class Controller {
@@ -64,17 +66,19 @@ public class Controller {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Znajdź plik");
+        Map.Entry<String, String>[] extensionsArray = new Map.Entry[]{
+                new AbstractMap.SimpleEntry("ALL FILES", "*.*"),
+                new AbstractMap.SimpleEntry("XLS", "*.xls"),
+                new AbstractMap.SimpleEntry("XLSX", "*.xlsx")};
 
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All FILES", "*.*"),
-                new FileChooser.ExtensionFilter("XLS", "*.xls"),
-                new FileChooser.ExtensionFilter("XLSX", "*.xlsx"));
+        fileChooser.getExtensionFilters().addAll
+                (Arrays.stream(extensionsArray).map(entry-> new FileChooser.ExtensionFilter(entry.getKey(), entry.getValue())).collect(Collectors.toList()));
+
         File selectedFile = fileChooser.showOpenDialog(pane.getScene().getWindow());
         if (selectedFile != null) {
             openFile(selectedFile);
             excelFilePath = selectedFile.getPath();
         }
-
     }
 
     @FXML
@@ -100,10 +104,8 @@ public class Controller {
         for (Node node : pane.getChildren()) {
             if (node instanceof TextField && ((TextField) node).getText().length() == 0) {
                 String unField = node.getId() + " nie jest wypelniony";
-                System.out.println(node.getId() + " nie jest wypelniony");
                 alertERROR = new Alert(Alert.AlertType.ERROR);
-                alertERROR.setHeaderText(unField);
-                alertERROR.show();
+                carricamentoService.errorSet(unField, alertERROR);
                 hasEmpty = false;
                 break;
             }
@@ -113,6 +115,7 @@ public class Controller {
             textField = (TextField) pane.lookup("#textField" + i);
             inputString.append(textField.getText().toLowerCase());
         }
+
 
         if (inputString.charAt(0) == '0' ||
                 inputString.charAt(2) == '0' ||
@@ -126,7 +129,6 @@ public class Controller {
             alertERROR.show();
             hasEmpty = false;
         }
-
 
         if (hasEmpty) {
 
@@ -156,7 +158,7 @@ public class Controller {
                             case 0:
                                 //PROG_UDA
                                 textFieldInputProperLength = 7;
-                                cellText= carricamentoService.cellTextSet(cell,currentRow,colToCopy);
+                                cellText = carricamentoService.cellTextSet(cell, currentRow, colToCopy);
                                 if (cellText.length() != textFieldInputProperLength) {
                                     errorString.append("UDA in line" + counter + "does not have 7 digits**");
                                     mainPass = false;
@@ -190,10 +192,10 @@ public class Controller {
                                 //TipoDoc
 
                                 textFieldInputProperLength = 5;
-                                cellText= carricamentoService.cellTextSet(cell,currentRow,colToCopy);
+                                cellText = carricamentoService.cellTextSet(cell, currentRow, colToCopy);
 
                                 if (cellText.length() > textFieldInputProperLength) {
-                                    System.out.println(cellText);
+
                                     errorString.append("TipoDOC and Filiale in line " + counter + " has more than 5 numbers**");
                                     errorPass = true;
                                     mainPass = false;
@@ -203,7 +205,6 @@ public class Controller {
                                     exportString.append(StringUtils.repeat("0", stringProperLength)).append(cellText).append("*");
                                 }
                                 break;
-
                             case 3:
                                 //Dislocazione
                                 textFieldInputProperLength = 3;
@@ -215,7 +216,6 @@ public class Controller {
                                         errorString.append("DISLOCAZIONE in line" + counter + " has more than 3 numbers**");
                                         errorPass = true;
                                         mainPass = false;
-
                                     } else {
                                         stringProperLength = textFieldInputProperLength - cell.getStringCellValue().length();
                                         exportString.append(StringUtils.repeat("0", stringProperLength)).append(cell.getStringCellValue()).append("*");
@@ -243,9 +243,8 @@ public class Controller {
                                 break;
                             case 6:
                                 //ANNI CONS
-
                                 textFieldInputProperLength = 2;
-                                cellText= carricamentoService.cellTextSet(cell,currentRow,colToCopy);
+                                cellText = carricamentoService.cellTextSet(cell, currentRow, colToCopy);
                                 if (cellText.length() > textFieldInputProperLength) {
                                     errorString.append("ANNI CONSERVATIONI in line " + counter + " has more than 2 numbers**");
                                     mainPass = false;
@@ -288,8 +287,10 @@ public class Controller {
                                 if (inputString.charAt(i) == '0') {
                                     exportString.append(StringUtils.repeat("0", textFieldInputProperLength)).append("*");
                                 } else {
+
                                     cell = currentRow.getCell(colToCopy);
-                                    cellText = String.valueOf(((long) cell.getNumericCellValue()));
+                                    cellText = carricamentoService.cellTextSet(cell, currentRow, colToCopy);
+                                   // cellText = String.valueOf(((long) cell.getNumericCellValue()));
                                     stringProperLength = textFieldInputProperLength - cellText.length();
                                     exportString.append(StringUtils.repeat("0", stringProperLength)).append(cellText).append("*");
                                 }
@@ -311,7 +312,7 @@ public class Controller {
                                         exportString.append(cellText).append(StringUtils.repeat(" ", stringProperLength)).append("*");
                                     }
                                 }
-                            break;
+                                break;
                         }
                     }
                     if (errorPass) {
@@ -386,36 +387,11 @@ public class Controller {
     @FXML
     public void handleKeyPressed(KeyEvent keyEvent) {
         Set<Character> set = new HashSet<>();
-
-        for (Node node : pane.getChildren()) {
-            if (node instanceof TextField) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                if ((((TextField) node).getText().length() > 1 ||
-                        ((TextField) node).getText().length() == 1 &&
-                                !(((TextField) node).getText().toLowerCase().matches("[a-n]|[0]")))) {
-                    String unField = "You can put only letters from a to n or 0!!!!! A to N are OK as well:)";
-                    carricamentoService.errorSet(unField, alert);
-                    ((TextField) node).setText(StringUtils.EMPTY);
-                    break;
-                } else if (((TextField) node).getText().length() == 1) {
-                    if (set.contains(((TextField) node).getText().charAt(0)) && !(((TextField) node).getText().matches("[0]"))) {
-                        String duplicate = "You duplicated the value";
-
-                        carricamentoService.errorSet(duplicate, alert);
-                        ((TextField) node).setText(StringUtils.EMPTY);
-                    } else {
-                        set.add(((TextField) node).getText().charAt(0));
-                    }
-                }
-            }
-        }
+        carricamentoService.handleKeyPressedMethod(pane, set, carricamentoService);
     }
 
     public void cleanButton(ActionEvent event) {
-        for (int i = 0; i < numberOfTextFields; i++) {
-            textField = (TextField) pane.lookup("#textField" + i);
-            textField.setText(StringUtils.EMPTY);
-        }
+        carricamentoService.textFieldsClearMethod(numberOfTextFields, textField, pane);
     }
 
     @FXML
